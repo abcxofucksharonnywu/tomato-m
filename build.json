@@ -13,5 +13,21 @@
 				 "provisioningProfile": "128c367a-eb99-4a02-a6d0-2a9958cf96e7"
 
 			}
-	  }
+	  },
+	  "android": {
+         "debug": {
+             "keystore": "android.keystore",
+             "storePassword": "android.keystore",
+             "alias": "kerryfeng",
+             "password" : "kerryfeng",
+             "keystoreType": ""
+         },
+         "release": {
+             "keystore": "android.keystore",
+             "storePassword": "kerryfeng",
+             "alias": "android.keystore",
+             "password" : "kerryfeng",
+             "keystoreType": ""
+         }
+     }
  }
