@@ -1,0 +1,17 @@
+{
+	  "ios": {
+			"debug": {
+				 "codeSignIdentitiy": "iPhone Developer",
+				 "provisioningProfile": "128c367a-eb99-4a02-a6d0-2a9958cf96e7"
+			},
+			"adhoc": {
+				 "codeSignIdentitiy": "iPhone Distribution",
+				 "provisioningProfile": "128c367a-eb99-4a02-a6d0-2a9958cf96e7"
+			},
+			"release": {
+				 "codeSignIdentitiy": "iPhone Distribution",
+				 "provisioningProfile": "128c367a-eb99-4a02-a6d0-2a9958cf96e7"
+
+			}
+	  }
+ }
