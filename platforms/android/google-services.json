@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "316933751817",
+    "firebase_url": "https://tomato-18eae.firebaseio.com",
+    "project_id": "tomato-18eae",
+    "storage_bucket": "tomato-18eae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316933751817:android:e5c399b868eb6e62",
+        "android_client_info": {
+          "package_name": "com.abcxo.tomato"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316933751817-uadbtuvd5c1b4ep7gbe1p9vdfom060ga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN-KMDn_IWYcDV7Z7ALTYSMR5RJyW4M5I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316933751817:android:d873b45c62147d86",
+        "android_client_info": {
+          "package_name": "com.aa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316933751817-uadbtuvd5c1b4ep7gbe1p9vdfom060ga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN-KMDn_IWYcDV7Z7ALTYSMR5RJyW4M5I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

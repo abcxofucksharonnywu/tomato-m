@@ -16,7 +16,7 @@
         "cordova-plugin-crosswalk-webview": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
-        "cordova-plugin-device": {
+        "cordova-plugin-firebase": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
         "cordova-plugin-splashscreen": {

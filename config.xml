@@ -7,7 +7,6 @@
     <author email="dev@cordova.apache.org" href="http://cordova.io">
         Apache Cordova Team
     </author>
-    <content src="http://localhost:0" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
@@ -16,18 +15,24 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <icon src="resources/icon.png" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <preference name="xwalkVersion" value="xwalk_core_library_beta:18+" />
+        <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
+        <preference name="xwalkMode" value="embedded" />
+        <preference name="xwalkMultipleApk" value="true" />
     </platform>
     <platform name="ios">
+        <content src="http://localhost:0" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
     <preference name="DisallowOverscroll" value="true" />
-    <preference name="AlternateContentSrc" value="http://localhost:0" />
-    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
     <preference name="xwalkVersion" value="xwalk_core_library_beta:18+" />
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
     <preference name="xwalkMode" value="embedded" />
     <preference name="xwalkMultipleApk" value="true" />
+    <preference name="AlternateContentSrc" value="http://localhost:0" />
+    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
 </widget>

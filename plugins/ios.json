@@ -7,25 +7,25 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-statusbar": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-device": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
         "ca.dpogue.webp": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-labs-wkwebview-engine-localhost": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
         "cordova-plugin-crosswalk-webview": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
+        "cordova-plugin-firebase": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
         "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-labs-wkwebview-engine-localhost": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         }
     },

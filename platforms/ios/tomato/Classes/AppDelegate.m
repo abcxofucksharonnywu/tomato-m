@@ -27,13 +27,66 @@
 
 #import "AppDelegate.h"
 #import "MainViewController.h"
-
+#import <FirebaseAnalytics/FirebaseAnalytics.h>
+#import <FirebaseMessaging/FirebaseMessaging.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
 {
+    [FIRApp configure];
+    
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge
+                                                                                         |UIUserNotificationTypeSound
+                                                                                         |UIUserNotificationTypeAlert)
+                                                                             categories:nil];
+    [application registerUserNotificationSettings:settings];
+
     self.viewController = [[MainViewController alloc] init];
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
+
+-(void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings{
+    [application registerForRemoteNotifications];
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken{
+    NSLog(@"deviceToken register success. %@", deviceToken);
+    [self connectToFcm];
+}
+
+
+-(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error{
+    NSLog(@"deviceToken register error. %@", error);
+}
+-(void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo{
+    NSLog(@"notification %@",userInfo);
+}
+
+-(void)applicationWillEnterForeground:(UIApplication *)application{
+    [self connectToFcm];
+}
+
+
+-(void)applicationDidEnterBackground:(UIApplication *)application{
+//    [[FIRMessaging messaging] disconnect];
+    NSLog(@"Disconnected from FCM");
+}
+
+
+
+
+- (void)connectToFcm {
+    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"Unable to connect to FCM. %@", error);
+        } else {
+            NSLog(@"Connected to FCM.");
+        }
+    }];
+}
+
+
+
+
 
 @end

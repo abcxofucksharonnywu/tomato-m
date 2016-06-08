@@ -15,13 +15,6 @@
 			}
 	  },
 	  "android": {
-         "debug": {
-             "keystore": "android.keystore",
-             "storePassword": "android.keystore",
-             "alias": "kerryfeng",
-             "password" : "kerryfeng",
-             "keystoreType": ""
-         },
          "release": {
              "keystore": "android.keystore",
              "storePassword": "kerryfeng",
