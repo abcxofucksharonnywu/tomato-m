@@ -9,30 +9,6 @@
                 "parents": {
                     "/*": [
                         {
-                            "xml": "<feature name=\"WebP\"><param name=\"ios-package\" value=\"WebPPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Firebase\"><param name=\"ios-package\" value=\"CDFirebase\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"SplashScreen\"><param name=\"ios-package\" value=\"CDVSplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"StatusBar\"><param name=\"ios-package\" value=\"CDVStatusBar\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<preference name=\"StatusBarOverlaysWebView\" value=\"true\" />",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<preference name=\"StatusBarStyle\" value=\"lightcontent\" />",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"File\"><param name=\"ios-package\" value=\"CDVFile\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         },
@@ -59,6 +35,26 @@
                         {
                             "xml": "<preference name=\"CordovaWebViewEngine\" value=\"CDVWKWebViewEngine\" />",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Firebase\"><param name=\"ios-package\" value=\"CDFirebase\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SplashScreen\"><param name=\"ios-package\" value=\"CDVSplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"StatusBar\"><param name=\"ios-package\" value=\"CDVStatusBar\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<preference name=\"StatusBarOverlaysWebView\" value=\"true\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<preference name=\"StatusBarStyle\" value=\"lightcontent\" />",
+                            "count": 1
                         }
                     ]
                 }
@@ -66,24 +62,6 @@
         }
     },
     "installed_plugins": {
-        "ca.dpogue.webp": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-crosswalk-webview": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-firebase": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-splashscreen": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-statusbar": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
         "cordova-plugin-compat": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
@@ -98,34 +76,22 @@
         },
         "cordova-labs-wkwebview-engine-localhost": {
             "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-firebase": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
         }
     },
     "dependent_plugins": {},
     "modules": [
-        {
-            "file": "plugins/cordova-plugin-firebase/www/firebase.js",
-            "id": "cordova-plugin-firebase.firebase",
-            "pluginId": "cordova-plugin-firebase",
-            "clobbers": [
-                "firebase"
-            ]
-        },
-        {
-            "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
-            "id": "cordova-plugin-splashscreen.SplashScreen",
-            "pluginId": "cordova-plugin-splashscreen",
-            "clobbers": [
-                "navigator.splashscreen"
-            ]
-        },
-        {
-            "file": "plugins/cordova-plugin-statusbar/www/statusbar.js",
-            "id": "cordova-plugin-statusbar.statusbar",
-            "pluginId": "cordova-plugin-statusbar",
-            "clobbers": [
-                "window.StatusBar"
-            ]
-        },
         {
             "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
             "id": "cordova-plugin-file.DirectoryEntry",
@@ -306,19 +272,41 @@
             "clobbers": [
                 "cordova.exec"
             ]
+        },
+        {
+            "file": "plugins/cordova-plugin-firebase/www/firebase.js",
+            "id": "cordova-plugin-firebase.firebase",
+            "pluginId": "cordova-plugin-firebase",
+            "clobbers": [
+                "firebase"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+            "id": "cordova-plugin-splashscreen.SplashScreen",
+            "pluginId": "cordova-plugin-splashscreen",
+            "clobbers": [
+                "navigator.splashscreen"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-statusbar/www/statusbar.js",
+            "id": "cordova-plugin-statusbar.statusbar",
+            "pluginId": "cordova-plugin-statusbar",
+            "clobbers": [
+                "window.StatusBar"
+            ]
         }
     ],
     "plugin_metadata": {
-        "ca.dpogue.webp": "1.2.0",
-        "cordova-plugin-crosswalk-webview": "1.7.0",
-        "cordova-plugin-firebase": "1.0",
-        "cordova-plugin-splashscreen": "3.2.2",
-        "cordova-plugin-statusbar": "2.1.3",
-        "cordova-plugin-whitelist": "1.2.2",
         "cordova-plugin-compat": "1.0.0",
         "cordova-plugin-file": "4.2.0",
         "cordova-labs-local-webserver": "2.3.1",
         "cordova-plugin-wkwebview-engine": "1.0.3",
-        "cordova-labs-wkwebview-engine-localhost": "0.4.0"
+        "cordova-labs-wkwebview-engine-localhost": "0.4.0",
+        "cordova-plugin-firebase": "1.0",
+        "cordova-plugin-splashscreen": "3.2.2",
+        "cordova-plugin-statusbar": "2.1.3",
+        "cordova-plugin-whitelist": "1.2.2"
     }
 }

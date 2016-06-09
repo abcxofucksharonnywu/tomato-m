@@ -1,7 +1,7 @@
 {
-    "CFNetwork.framework": 2,
-    "libz.dylib": 2,
-    "WebKit.framework": 2,
+    "CFNetwork.framework": 1,
+    "libz.dylib": 1,
+    "WebKit.framework": 1,
     "AddressBook.framework": 1,
     "libsqlite3.tbd": 1,
     "libstdc++.tbd": 1

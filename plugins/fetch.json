@@ -15,14 +15,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "ca.dpogue.webp": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-webp"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-labs-local-webserver": {
         "source": {
             "type": "git",
@@ -49,27 +41,10 @@
         "is_top_level": false,
         "variables": {}
     },
-    "cordova-plugin-crosswalk-webview": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-crosswalk-webview"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-splashscreen": {
         "source": {
             "type": "registry",
             "id": "cordova-plugin-splashscreen"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "cordova-plugin-firebase": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/abcxofucksharonnywu/cordova-plugin-firebase.git",
-            "subdir": "."
         },
         "is_top_level": true,
         "variables": {}
@@ -89,6 +64,15 @@
             "url": "https://github.com/apache/cordova-plugins.git",
             "subdir": "wkwebview-engine-localhost",
             "ref": "master"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-firebase": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/abcxofucksharonnywu/cordova-plugin-firebase.git",
+            "subdir": "."
         },
         "is_top_level": true,
         "variables": {}

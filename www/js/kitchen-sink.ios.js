@@ -12,34 +12,39 @@ var mainView = myApp.addView('.view-main', {
 });
 
 
-var view1 = myApp.addView('#view-1', {
+myApp.addView('#view-1', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
 });
 
-var view2 = myApp.addView('#view-2', {
-    // Enable Dynamic Navbar for this view
-    dynamicNavbar: true,
-});
-
-
-var view3 = myApp.addView('#view-3', {
+myApp.addView('#view-2', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
 });
 
 
-var view4 = myApp.addView('#view-4', {
+myApp.addView('#view-3', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
 });
 
 
-// // Add another view, which is in right panel
-// var rightView = myApp.addView('.view-right', {
-//     // Enable Dynamic Navbar for this view
-//     dynamicNavbar: true
-// });
+myApp.addView('#view-4', {
+    // Enable Dynamic Navbar for this view
+    dynamicNavbar: true,
+});
+
+var user = {device:'wefwefwef'}
+
+$.post('/m/user/register', user, function (result) {
+    if (result.code == 200) {
+        console.log("user register");
+    } else {
+        console.log(result.msg);
+    }
+})
+;
+
 
 // Show/hide preloader for remote ajax loaded pages
 // Probably should be removed on a production/local app
@@ -1130,311 +1135,64 @@ $$(document).on('click', '.ks-generate-page', createContentPage);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-myApp.onPageInit('home', function (page) {
-    console.log('home init')
-    var width = $(".page[data-page='home'] .page-content").width()
-    var ratio = width / 375.0
-    $(".page[data-page='home'] .page-content .banner").height(120 * ratio)
-    $(".page[data-page='home'] .page-content .multiRect >div").height(165 * ratio)
-    $(".page[data-page='home'] .page-content .rect >div").height(140 * ratio)
-    $(".page[data-page='home'] .page-content .double img").height((width - 1) / 2)
+function onActivity(el, name) {
     Vue.filter('date', function (value) {
         return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
     })
+
     var vue = new Vue({
-        el: ".page[data-page='home']",
+        el: el,
         data: {
-            activity: {
-                title: '主页',
-                name: 'home',
-                content: '番茄app的主页',
-                type: 'layout',
-                url: 'http://localhost:3000/m/home.html',
-                layouts: [
-                    {
-                        type: 'banner',
-                        items: [
-                            {
-                                img: 'img/demo_banner0.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '750x240'
-                            },
-                            {
-                                img: 'img/demo_banner1.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '750x240'
-                            },
-                            {
-                                img: 'img/demo_banner2.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '750x240'
-                            },
-                            {
-                                img: 'img/demo_banner3.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '750x240'
-                            }
-                        ]
-                    },
-                    {
-                        type: 'multiRect',
-                        items: [
-                            {
-                                img: 'img/demo_multiRect0.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '500x330'
-                            },
-                            {
-                                img: 'img/demo_multiRect1.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '250x330'
-                            },
-                            {
-                                img: 'img/demo_multiRect2.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '250x330'
-                            },
-                            {
-                                img: 'img/demo_multiRect3.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '250x330'
-                            },
-                            {
-                                img: 'img/demo_multiRect4.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '250x330'
-                            }
-                        ]
-                    },
-                    {
-                        type: 'rect',
-                        items: [
-                            {
-                                img: 'img/demo_rect0.jpg',
-                                type: 'activity',
-                                url: 'detail.html',
-                                size: '750x280'
-                            }
-                        ]
-                    },
-                    {
-                        type: 'double',
-                        items: [
-                            {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            },
-                            {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }, {
-                                img: 'https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                type: 'goods',
-                                url: 'detail.html',
-                                size: '375x528',
-                                goods: {
-                                    categoryId: '',
-                                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                    content: '',
-                                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp',
-                                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg_.webp',
-                                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg_.webp'],
-                                    quantity: '2',
-                                    price: '20.2',
-                                    sale: '100',
-                                    date: '1462196014850'
-                                }
-
-                            }
-                        ]
-                    }],
-                date: '1460982447980'
-            }
+            activity: null
         },
-        ready: function () {
-            myApp.initPageSwiper($$(".page[data-page='home']"))
-        },
-        methods: {}
+        watch: {
+            'activity': function (val, oldVal) {
+                var width = $(el + ".page-content").width()
+                var ratio = width / 375.0
+                $(el + ".page-content .banner").height(120 * ratio)
+                $(el + ".page-content .multiRect >div").height(165 * ratio)
+                $(el + ".page-content .rect >div").height(140 * ratio)
+                $(el + ".page-content .double img").height((width - 1) / 2)
+                myApp.initPageSwiper($$(el))
+            },
+        }
     });
 
+    var ptrContent = $$(el + ".pull-to-refresh-content");
+    ptrContent.on('refresh', function (e) {
+        $.get("http://localhost:3000/m/activity/query?name=" + name, function (result) {
+            if (result.code == 200) {
+                vue.activity = result.content
+                console.log("home load");
+            } else {
+                console.log(result.msg);
+            }
+            myApp.pullToRefreshDone(ptrContent);
 
+        });
+
+    });
+    myApp.pullToRefreshTrigger(ptrContent)
+}
+
+myApp.onPageInit('home', function (page) {
+    console.log('home init')
+    onActivity(".page[data-page='home'] ", 'home')
 }).trigger()
 
+myApp.onPageInit('activity', function (page) {
+    var name = page.query.name
+    console.log('activity ' + name + ' init')
+    $(".page:not(.activity)[data-page='activity']").addClass(name).addClass('activity')
+    var el = ".page." + name + "[data-page='activity'] "
+    onActivity(el, name)
+
+})
+
+myApp.onPageInit('activity-preview', function (page) {
+    console.log('activity-preview init')
+    onActivity(".page[data-page='activity-preview'] ", 'activity-preview')
+}).trigger()
 
 function onCart(el) {
     Vue.filter('date', function (value) {

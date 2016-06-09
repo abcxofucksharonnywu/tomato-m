@@ -7,10 +7,7 @@
         "files": {}
     },
     "installed_plugins": {
-        "ca.dpogue.webp": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-plugin-crosswalk-webview": {
+        "cordova-labs-wkwebview-engine-localhost": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
         "cordova-plugin-firebase": {
@@ -23,9 +20,6 @@
             "PACKAGE_NAME": "com.abcxo.tomato"
         },
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.abcxo.tomato"
-        },
-        "cordova-labs-wkwebview-engine-localhost": {
             "PACKAGE_NAME": "com.abcxo.tomato"
         }
     },

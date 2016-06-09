@@ -79,7 +79,6 @@
         
         <framework src="src/ios/FirebaseRemoteConfig.framework" custom="true" />
         
-        <framework src="src/ios/FirebaseStorage.framework" custom="true" />
         <framework src="src/ios/GoogleNetworkingUtilities.framework" custom="true" />
         
         
