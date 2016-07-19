@@ -21,6 +21,15 @@
         },
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-nativestorage": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
+        },
+        "cordova-plugin-scan": {
+            "PACKAGE_NAME": "com.abcxo.tomato"
         }
     },
     "dependent_plugins": {

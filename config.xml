@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.abcxo.tomato" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>tomato</name>
+    <name>大吉</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
@@ -15,6 +15,8 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <access origin="*"/>
+    <allow-navigation href="*"/>
     <icon src="resources/icon.png" />
     <platform name="android">
         <allow-intent href="market:*" />
@@ -22,11 +24,20 @@
         <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
         <preference name="xwalkMode" value="embedded" />
         <preference name="xwalkMultipleApk" value="true" />
+        
+        <splash src="resources/android-splash.png"/>
     </platform>
     <platform name="ios">
         <content src="http://localhost:0" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
+        
+        <splash src="resources/ios-splash-0.png" width="640" height="960"/>
+        <splash src="resources/ios-splash-1.png" width="640" height="1136"/>
+        <splash src="resources/ios-splash-2.png" width="750" height="1334"/>
+        <splash src="resources/ios-splash-3.png" width="1242" height="2208"/>
+        <splash src="resources/ios-splash-4.png" width="1536" height="2048"/>        
+        
     </platform>
     <preference name="DisallowOverscroll" value="true" />
     <preference name="xwalkVersion" value="xwalk_core_library_beta:18+" />

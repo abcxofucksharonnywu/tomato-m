@@ -5,1143 +5,250 @@ var myApp = new Framework7({
 // Expose Internal DOM library
 var $$ = Dom7;
 
+function toast(message) {
+    var toast = myApp.toast(message, '', {});
+    toast.show()
+}
+
 // Add main view
 var mainView = myApp.addView('.view-main', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
+    domCache: true
 });
 
 
-myApp.addView('#view-1', {
+var view1 = myApp.addView('#view-1', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
+    domCache: true
 });
 
-myApp.addView('#view-2', {
+var view2 = myApp.addView('#view-2', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
+    domCache: true
 });
 
 
-myApp.addView('#view-3', {
+var view3 = myApp.addView('#view-3', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
+    domCache: true
 });
 
 
-myApp.addView('#view-4', {
+var view4 = myApp.addView('#view-4', {
     // Enable Dynamic Navbar for this view
     dynamicNavbar: true,
+    domCache: true
 });
 
-var user = {device:'wefwefwef'}
-var host = 'http://localhost:3000'
+
+//var host = 'http://www.dajitogo.com:3000'
+ var host = 'http://localhost:3000'
+
+Date.prototype.format = function (format) {
+    var o = {
+        "M+": this.getMonth() + 1, //month
+        "d+": this.getDate(),    //day
+        "h+": this.getHours(),   //hour
+        "m+": this.getMinutes(), //minute
+        "s+": this.getSeconds(), //second
+        "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+        "S": this.getMilliseconds() //millisecond
+    }
+    if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+        (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)if (new RegExp("(" + k + ")").test(format))
+        format = format.replace(RegExp.$1,
+            RegExp.$1.length == 1 ? o[k] :
+                ("00" + o[k]).substr(("" + o[k]).length));
+    return format;
+}
+
+Vue.filter('date', function (value) {
+    return new Date(parseInt(value)).format('yyyy年MM月dd日 hh時mm分ss秒')
+})
+
+Vue.filter('time', function (value) {
+    return new Date(parseInt(value)).format('MM月dd日 hh:mm')
+})
 
 
-$.post(host+'/m/user/register', user, function (result) {
-    if (result.code == 200) {
-        console.log("user register");
+var isApp = typeof cordova !== 'undefined'
+
+
+function setItem(key, value) {
+    if (isApp) {
+        NativeStorage.setItem(key, value, function (doc) {
+        }, function (error) {
+        });
     } else {
-        console.log(result.msg);
+        localStorage.setItem(key, value)
+    }
+
+}
+
+function getItem(key, callback) {
+    if (isApp) {
+        NativeStorage.getItem(key, function (doc) {
+            callback(doc)
+        }, function (error) {
+            callback(null)
+        });
+    } else {
+        callback(localStorage.getItem(key))
+    }
+
+}
+
+var user = {device: '', name: '', phone: ''}
+
+function storeUser(obj) {
+    user._id = obj._id
+    user.name = obj.name
+    user.device = obj.device
+    user.token = obj.token
+    user.phone = obj.phone
+    user.password = obj.password
+    user.date = obj.date
+    setItem("user", JSON.stringify(user))
+}
+
+
+function userInit() {
+    getItem('user', function (doc) {
+        if (doc) {
+            obj = JSON.parse(doc)
+            user._id = obj._id
+            user.name = obj.name
+            user.device = obj.device
+            user.token = obj.token
+            user.phone = obj.phone
+            user.password = obj.password
+            user.date = obj.date
+        } else {
+            if (isApp) {
+                user.device = device.uuid
+                user.name = device.name
+            } else {
+                user.device = '111111'
+                user.name = 'tomato'
+            }
+            $.post(host + '/m/user/register', user, function (result) {
+                if (result.code == 200) {
+                    storeUser(result.content)
+                    console.log("user register");
+                } else {
+                    toast(result.msg);
+                    ;
+                }
+            })
+        }
+
+    })
+}
+
+
+function userTokenInit(token) {
+    console.log("user token init");
+    if (user._id && !user.token) {
+        $.get(host + '/m/user/token', {uid: user._id, token: token}, function (result) {
+            if (result.code == 200) {
+                storeUser(result.content)
+                console.log("user token");
+            } else {
+                toast(result.msg);
+                ;
+            }
+        })
+    }
+}
+
+function notification(doc) {
+    myApp.addNotification({
+        title: doc.title,
+        message: doc.text,
+        media: '<i class="icon icon-logo"></i>',
+        onClick: function (event) {
+            myApp.closeNotification(event.currentTarget)
+            if (doc.type == 'goods') {
+                toDetail({
+                    goodsId: doc.content
+                }, true)
+            } else if (doc.type == 'order') {
+                myApp.getCurrentView().router.load({
+                    url: 'order.html'
+                })
+            } else if (doc.type == 'order-detail') {
+                toOrderDetail({_id: doc.content}, null, true)
+            } else if (doc.type == 'url') {
+                myApp.getCurrentView().router.load({
+                    url: 'web.html',
+                    query: {url: doc.content, name: '網頁'}
+                })
+            }
+        }
+    });
+}
+
+if (isApp) {
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        userInit()
+    }
+} else {
+    userInit()
+}
+
+
+var view2Init = false
+var view3Init = false
+var view4Init = false
+$(".tab-link").click(function (event) {
+    event.preventDefault()
+    var href = $(event.currentTarget).attr('href')
+    if (href == '#view-2') {
+        if (!view2Init) {
+            view2Init = true
+            onCategoryPageInit.trigger()
+        }
+    } else if (href == '#view-3') {
+        if (!view3Init) {
+            view3Init = true
+            onCartPageInit.trigger()
+        }
+    } else if (href == '#view-4') {
+        if (!view4Init) {
+            view4Init = true
+            onMePageInit.trigger()
+        }
     }
 })
-;
 
 
-// Show/hide preloader for remote ajax loaded pages
-// Probably should be removed on a production/local app
-$$(document).on('ajaxStart', function (e) {
-    if (e.detail.xhr.requestUrl.indexOf('autocomplete-languages.json') >= 0) {
-        // Don't show preloader for autocomplete demo requests
-        return;
+function generatePageId(pageName) {
+    var character = "";
+    for (var i = 0; i < 32; i++) {
+        character += String.fromCharCode(Math.floor(Math.random() * 26) + "a".charCodeAt(0));
     }
-    myApp.showIndicator();
-});
-$$(document).on('ajaxComplete', function (e) {
-    if (e.detail.xhr.requestUrl.indexOf('autocomplete-languages.json') >= 0) {
-        // Don't show preloader for autocomplete demo requests
-        return;
-    }
-    myApp.hideIndicator();
-});
-
-// Callbacks for specific pages when it initialized
-/* ===== Modals Page events  ===== */
-myApp.onPageInit('modals', function (page) {
-    $$('.demo-alert').on('click', function () {
-        myApp.alert('Hello!');
-    });
-    $$('.demo-confirm').on('click', function () {
-        myApp.confirm('Are you feel good today?', function () {
-            myApp.alert('Great!');
-        });
-    });
-    $$('.demo-prompt').on('click', function () {
-        myApp.prompt('What is your name?', function (data) {
-            // @data contains input value
-            myApp.confirm('Are you sure that your name is ' + data + '?', function () {
-                myApp.alert('Ok, your name is ' + data + ' ;)');
-            });
-        });
-    });
-    $$('.demo-login').on('click', function () {
-        myApp.modalLogin('Enter your username and password', function (username, password) {
-            myApp.alert('Thank you! Username: ' + username + ', password: ' + password);
-        });
-    });
-    $$('.demo-password').on('click', function () {
-        myApp.modalPassword('Enter your password', function (password) {
-            myApp.alert('Thank you! Password: ' + password);
-        });
-    });
-    $$('.demo-modals-stack').on('click', function () {
-        // Open 5 alerts
-        myApp.alert('Alert 1');
-        myApp.alert('Alert 2');
-        myApp.alert('Alert 3');
-        myApp.alert('Alert 4');
-        myApp.alert('Alert 5');
-    });
-    $$('.demo-picker-modal').on('click', function () {
-        myApp.pickerModal('.picker-modal-demo');
-    });
-});
-
-/* ===== Preloader Page events ===== */
-myApp.onPageInit('preloader', function (page) {
-    $$('.demo-indicator').on('click', function () {
-        myApp.showIndicator();
-        setTimeout(function () {
-            myApp.hideIndicator();
-        }, 2000);
-    });
-    $$('.demo-preloader').on('click', function () {
-        myApp.showPreloader();
-        setTimeout(function () {
-            myApp.hidePreloader();
-        }, 2000);
-    });
-    $$('.demo-preloader-custom').on('click', function () {
-        myApp.showPreloader('My text...');
-        setTimeout(function () {
-            myApp.hidePreloader();
-        }, 2000);
-    });
-});
-
-/* ===== Swipe to delete events callback demo ===== */
-myApp.onPageInit('swipe-delete', function (page) {
-    $$('.demo-remove-callback').on('deleted', function () {
-        myApp.alert('Thanks, item removed!');
-    });
-});
-myApp.onPageInit('swipe-delete media-lists', function (page) {
-    $$('.demo-reply').on('click', function () {
-        myApp.alert('Reply');
-    });
-    $$('.demo-mark').on('click', function () {
-        myApp.alert('Mark');
-    });
-    $$('.demo-forward').on('click', function () {
-        myApp.alert('Forward');
-    });
-});
-
-
-/* ===== Action sheet, we use it on few pages ===== */
-myApp.onPageInit('swipe-delete modals media-lists', function (page) {
-    var actionSheetButtons = [
-        // First buttons group
-        [
-            // Group Label
-            {
-                text: 'Here comes some optional description or warning for actions below',
-                label: true
-            },
-            // First button
-            {
-                text: 'Alert',
-                onClick: function () {
-                    myApp.alert('He Hoou!');
-                }
-            },
-            // Another red button
-            {
-                text: 'Nice Red Button ',
-                color: 'red',
-                onClick: function () {
-                    myApp.alert('You have clicked red button!');
-                }
-            },
-        ],
-        // Second group
-        [
-            {
-                text: 'Cancel',
-                bold: true
-            }
-        ]
-    ];
-    $$('.demo-actions').on('click', function (e) {
-        myApp.actions(actionSheetButtons);
-    });
-    $$('.demo-actions-popover').on('click', function (e) {
-        // We need to pass additional target parameter (this) for popover
-        myApp.actions(this, actionSheetButtons);
-    });
-
-});
-
-/* ===== Messages Page ===== */
-myApp.onPageInit('messages', function (page) {
-    var conversationStarted = false;
-    var answers = [
-        'Yes!',
-        'No',
-        'Hm...',
-        'I am not sure',
-        'And what about you?',
-        'May be ;)',
-        'Lorem ipsum dolor sit amet, consectetur',
-        'What?',
-        'Are you sure?',
-        'Of course',
-        'Need to think about it',
-        'Amazing!!!',
-    ];
-    var people = [
-        {
-            name: 'Kate Johnson',
-            avatar: 'http://lorempixel.com/output/people-q-c-100-100-9.jpg'
-        },
-        {
-            name: 'Blue Ninja',
-            avatar: 'http://lorempixel.com/output/people-q-c-100-100-7.jpg'
-        },
-
-    ];
-    var answerTimeout, isFocused;
-
-    // Initialize Messages
-    var myMessages = myApp.messages('.messages');
-
-    // Initialize Messagebar
-    var myMessagebar = myApp.messagebar('.messagebar');
-
-    $$('.messagebar a.send-message').on('touchstart mousedown', function () {
-        isFocused = document.activeElement && document.activeElement === myMessagebar.textarea[0];
-    });
-    $$('.messagebar a.send-message').on('click', function (e) {
-        // Keep focused messagebar's textarea if it was in focus before
-        if (isFocused) {
-            e.preventDefault();
-            myMessagebar.textarea[0].focus();
-        }
-        var messageText = myMessagebar.value();
-        if (messageText.length === 0) {
-            return;
-        }
-        // Clear messagebar
-        myMessagebar.clear();
-
-        // Add Message
-        myMessages.addMessage({
-            text: messageText,
-            type: 'sent',
-            day: !conversationStarted ? 'Today' : false,
-            time: !conversationStarted ? (new Date()).getHours() + ':' + (new Date()).getMinutes() : false
-        });
-        conversationStarted = true;
-        // Add answer after timeout
-        if (answerTimeout) clearTimeout(answerTimeout);
-        answerTimeout = setTimeout(function () {
-            var answerText = answers[Math.floor(Math.random() * answers.length)];
-            var person = people[Math.floor(Math.random() * people.length)];
-            myMessages.addMessage({
-                text: answers[Math.floor(Math.random() * answers.length)],
-                type: 'received',
-                name: person.name,
-                avatar: person.avatar
-            });
-        }, 2000);
-    });
-});
-
-/* ===== Pull To Refresh Demo ===== */
-myApp.onPageInit('pull-to-refresh', function (page) {
-    // Dummy Content
-    var songs = ['Yellow Submarine', 'Don\'t Stop Me Now', 'Billie Jean', 'Californication'];
-    var authors = ['Beatles', 'Queen', 'Michael Jackson', 'Red Hot Chili Peppers'];
-    // Pull to refresh content
-    var ptrContent = $$(page.container).find('.pull-to-refresh-content');
-    // Add 'refresh' listener on it
-    ptrContent.on('refresh', function (e) {
-        // Emulate 2s loading
-        setTimeout(function () {
-            var picURL = 'http://lorempixel.com/88/88/abstract/' + Math.round(Math.random() * 10);
-            var song = songs[Math.floor(Math.random() * songs.length)];
-            var author = authors[Math.floor(Math.random() * authors.length)];
-            var linkHTML = '<li class="item-content">' +
-                '<div class="item-media"><img src="' + picURL + '" width="44"/></div>' +
-                '<div class="item-inner">' +
-                '<div class="item-title-row">' +
-                '<div class="item-title">' + song + '</div>' +
-                '</div>' +
-                '<div class="item-subtitle">' + author + '</div>' +
-                '</div>' +
-                '</li>';
-            ptrContent.find('ul').prepend(linkHTML);
-            // When loading done, we need to "close" it
-            myApp.pullToRefreshDone();
-        }, 2000);
-    });
-});
-
-/* ===== Sortable page ===== */
-myApp.onPageInit('sortable-list', function (page) {
-    // Sortable toggler
-    $$('.list-block.sortable').on('open', function () {
-        $$('.toggle-sortable').text('Done');
-    });
-    $$('.list-block.sortable').on('close', function () {
-        $$('.toggle-sortable').text('Edit');
-    });
-});
-
-/* ===== Photo Browser Examples ===== */
-// Create photoprobsers first:
-var photoBrowserPhotos = [
-    {
-        url: 'img/beach.jpg',
-        caption: 'Amazing beach in Goa, India'
-    },
-    'http://placekitten.com/1024/1024',
-    'img/lock.jpg',
-    {
-        url: 'img/monkey.jpg',
-        caption: 'I met this monkey in Chinese mountains'
-    },
-    {
-        url: 'img/mountains.jpg',
-        caption: 'Beautiful mountains in Zhangjiajie, China'
-    }
-
-];
-var photoBrowserStandalone = myApp.photoBrowser({
-    photos: photoBrowserPhotos
-});
-var photoBrowserPopup = myApp.photoBrowser({
-    photos: photoBrowserPhotos,
-    type: 'popup'
-});
-var photoBrowserPage = myApp.photoBrowser({
-    photos: photoBrowserPhotos,
-    type: 'page',
-    backLinkText: 'Back'
-});
-var photoBrowserDark = myApp.photoBrowser({
-    photos: photoBrowserPhotos,
-    theme: 'dark'
-});
-var photoBrowserPopupDark = myApp.photoBrowser({
-    photos: photoBrowserPhotos,
-    theme: 'dark',
-    type: 'popup'
-});
-var photoBrowserLazy = myApp.photoBrowser({
-    photos: photoBrowserPhotos,
-    lazyLoading: true,
-    theme: 'dark'
-});
-myApp.onPageInit('photo-browser', function (page) {
-    $$('.ks-pb-standalone').on('click', function () {
-        photoBrowserStandalone.open();
-    });
-    $$('.ks-pb-popup').on('click', function () {
-        photoBrowserPopup.open();
-    });
-    $$('.ks-pb-page').on('click', function () {
-        photoBrowserPage.open();
-    });
-    $$('.ks-pb-popup-dark').on('click', function () {
-        photoBrowserPopupDark.open();
-    });
-    $$('.ks-pb-standalone-dark').on('click', function () {
-        photoBrowserDark.open();
-    });
-    $$('.ks-pb-lazy').on('click', function () {
-        photoBrowserLazy.open();
-    });
-});
-
-/* ===== Infinite Scroll Page ===== */
-myApp.onPageInit('infinite-scroll', function (page) {
-    // Loading trigger
-    var loading = false;
-    // Last loaded index, we need to pass it to script
-    var lastLoadedIndex = $$('.infinite-scroll .list-block li').length;
-    // Attach 'infinite' event handler
-    $$('.infinite-scroll').on('infinite', function () {
-        // Exit, if loading in progress
-        if (loading) return;
-        // Set loading trigger
-        loading = true;
-        // Request some file with data
-        $$.get('infinite-scroll-load.php', {leftIndex: lastLoadedIndex + 1}, function (data) {
-            loading = false;
-            if (data === '') {
-                // Nothing more to load, detach infinite scroll events to prevent unnecessary loadings
-                myApp.detachInfiniteScroll($$('.infinite-scroll'));
-            }
-            else {
-                // Append loaded elements to list block
-                $$('.infinite-scroll .list-block ul').append(data);
-                // Update last loaded index
-                lastLoadedIndex = $$('.infinite-scroll .list-block li').length;
-            }
-        });
-    });
-});
-
-/* ===== Notifications Page ===== */
-myApp.onPageInit('notifications', function (page) {
-    $$('.ks-notification-simple').on('click', function () {
-        myApp.addNotification({
-            title: 'Framework7',
-            message: 'This is a simple notification message with title and message'
-        });
-    });
-    $$('.ks-notification-full').on('click', function () {
-        myApp.addNotification({
-            title: 'Framework7',
-            subtitle: 'Notification subtitle',
-            message: 'This is a simple notification message with custom icon and subtitle',
-            media: '<i class="icon icon-f7"></i>'
-        });
-    });
-    $$('.ks-notification-custom').on('click', function () {
-        myApp.addNotification({
-            title: 'My Awesome App',
-            subtitle: 'New message from John Doe',
-            message: 'Hello, how are you? Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut posuere erat. Pellentesque id elementum urna, a aliquam ante. Donec vitae volutpat orci. Aliquam sed molestie risus, quis tincidunt dui.',
-            media: '<img width="44" height="44" style="border-radius:100%" src="http://lorempixel.com/output/people-q-c-100-100-9.jpg">'
-        });
-    });
-    $$('.ks-notification-callback').on('click', function () {
-        myApp.addNotification({
-            title: 'My Awesome App',
-            subtitle: 'New message from John Doe',
-            message: 'Hello, how are you? Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut posuere erat. Pellentesque id elementum urna, a aliquam ante. Donec vitae volutpat orci. Aliquam sed molestie risus, quis tincidunt dui.',
-            media: '<img width="44" height="44" style="border-radius:100%" src="http://lorempixel.com/output/people-q-c-100-100-9.jpg">',
-            onClose: function () {
-                myApp.alert('Notification closed');
-            }
-        });
-    });
-});
-
-/* ===== Login screen page events ===== */
-myApp.onPageInit('login-screen-embedded', function (page) {
-    $$(page.container).find('.list-button').on('click', function () {
-        var username = $$(page.container).find('input[name="username"]').val();
-        var password = $$(page.container).find('input[name="password"]').val();
-        myApp.alert('Username: ' + username + ', password: ' + password, function () {
-            mainView.router.back();
-        });
-    });
-});
-$$('.login-screen').find('.list-button').on('click', function () {
-    var username = $$('.login-screen').find('input[name="username"]').val();
-    var password = $$('.login-screen').find('input[name="password"]').val();
-    myApp.alert('Username: ' + username + ', password: ' + password, function () {
-        myApp.closeModal('.login-screen');
-    });
-});
-
-/* ===== Demo Popover ===== */
-$$('.popover a').on('click', function () {
-    myApp.closeModal('.popover');
-});
-
-/* ===== Color themes ===== */
-myApp.onPageInit('color-themes', function (page) {
-    var themes = 'theme-white theme-black theme-yellow theme-red theme-blue theme-green theme-pink theme-lightblue theme-orange theme-gray';
-    var layouts = 'layout-dark layout-white';
-    $$(page.container).find('.ks-color-theme').click(function () {
-        $$('body').removeClass(themes).addClass('theme-' + $$(this).attr('data-theme'));
-    });
-    $$(page.container).find('.ks-layout-theme').click(function () {
-        $$('body').removeClass(layouts).addClass('layout-' + $$(this).attr('data-theme'));
-    });
-});
-
-/* ===== Virtual List ===== */
-myApp.onPageInit('virtual-list', function (page) {
-    // Generate array with 10000 demo items:
-    var items = [];
-    for (var i = 0; i < 10000; i++) {
-        items.push({
-            title: 'Item ' + i,
-            subtitle: 'Subtitle ' + i
-        });
-    }
-
-    // Create virtual list
-    var virtualList = myApp.virtualList($$(page.container).find('.virtual-list'), {
-        // Pass array with items
-        items: items,
-        // Custom search function for searchbar
-        searchAll: function (query, items) {
-            var found = [];
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].title.indexOf(query) >= 0 || query.trim() === '') found.push(i);
-            }
-            return found; //return array with mathced indexes
-        },
-        // List item Template7 template
-        template: '<li>' +
-        '<a href="#" class="item-link item-content">' +
-        '<div class="item-inner">' +
-        '<div class="item-title-row">' +
-        '<div class="item-title">{{title}}</div>' +
-        '</div>' +
-        '<div class="item-subtitle">{{subtitle}}</div>' +
-        '</div>' +
-        '</a>' +
-        '</li>',
-        // Item height
-        height: 63,
-    });
-});
-/* ===== Swiper Two Way Control Gallery ===== */
-myApp.onPageInit('swiper-gallery', function (page) {
-    var swiperTop = myApp.swiper('.ks-swiper-gallery-top', {
-        nextButton: '.swiper-button-next',
-        prevButton: '.swiper-button-prev',
-        spaceBetween: 10
-    });
-    var swiperThumbs = myApp.swiper('.ks-swiper-gallery-thumbs', {
-        slidesPerView: 'auto',
-        spaceBetween: 10,
-        centeredSlides: true,
-        touchRatio: 0.2,
-        slideToClickedSlide: true
-    });
-    swiperTop.params.control = swiperThumbs;
-    swiperThumbs.params.control = swiperTop;
-});
-/* ===== Calendar ===== */
-myApp.onPageInit('calendar', function (page) {
-    // Default
-    var calendarDefault = myApp.calendar({
-        input: '#ks-calendar-default',
-    });
-    // With custom date format
-    var calendarDateFormat = myApp.calendar({
-        input: '#ks-calendar-date-format',
-        dateFormat: 'DD, MM dd, yyyy'
-    });
-    // With multiple values
-    var calendarMultiple = myApp.calendar({
-        input: '#ks-calendar-multiple',
-        dateFormat: 'M dd yyyy',
-        multiple: true
-    });
-    // Range Picker
-    var calendarRange = myApp.calendar({
-        input: '#ks-calendar-range',
-        dateFormat: 'M dd yyyy',
-        rangePicker: true
-    });
-    // Inline with custom toolbar
-    var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    var calendarInline = myApp.calendar({
-        container: '#ks-calendar-inline-container',
-        value: [new Date()],
-        weekHeader: false,
-        toolbarTemplate: '<div class="toolbar calendar-custom-toolbar">' +
-        '<div class="toolbar-inner">' +
-        '<div class="left">' +
-        '<a href="#" class="link icon-only"><i class="icon icon-back"></i></a>' +
-        '</div>' +
-        '<div class="center"></div>' +
-        '<div class="right">' +
-        '<a href="#" class="link icon-only"><i class="icon icon-forward"></i></a>' +
-        '</div>' +
-        '</div>' +
-        '</div>',
-        onOpen: function (p) {
-            $$('.calendar-custom-toolbar .center').text(monthNames[p.currentMonth] + ', ' + p.currentYear);
-            $$('.calendar-custom-toolbar .left .link').on('click', function () {
-                calendarInline.prevMonth();
-            });
-            $$('.calendar-custom-toolbar .right .link').on('click', function () {
-                calendarInline.nextMonth();
-            });
-        },
-        onMonthYearChangeStart: function (p) {
-            $$('.calendar-custom-toolbar .center').text(monthNames[p.currentMonth] + ', ' + p.currentYear);
-        }
-    });
-});
-
-/* ===== Pickers ===== */
-myApp.onPageInit('pickers', function (page) {
-    var today = new Date();
-
-    // iOS Device picker
-    var pickerDevice = myApp.picker({
-        input: '#ks-picker-device',
-        cols: [
-            {
-                textAlign: 'center',
-                values: ['iPhone 4', 'iPhone 4S', 'iPhone 5', 'iPhone 5S', 'iPhone 6', 'iPhone 6 Plus', 'iPad 2', 'iPad Retina', 'iPad Air', 'iPad mini', 'iPad mini 2', 'iPad mini 3']
-            }
-        ]
-    });
-
-    // Describe yourself picker
-    var pickerDescribe = myApp.picker({
-        input: '#ks-picker-describe',
-        rotateEffect: true,
-        cols: [
-            {
-                textAlign: 'left',
-                values: ('Super Lex Amazing Bat Iron Rocket Lex Cool Beautiful Wonderful Raining Happy Amazing Funny Cool Hot').split(' ')
-            },
-            {
-                values: ('Man Luthor Woman Boy Girl Person Cutie Babe Raccoon').split(' ')
-            },
-        ]
-    });
-
-    // Dependent values
-    var carVendors = {
-        Japanese: ['Honda', 'Lexus', 'Mazda', 'Nissan', 'Toyota'],
-        German: ['Audi', 'BMW', 'Mercedes', 'Volkswagen', 'Volvo'],
-        American: ['Cadillac', 'Chrysler', 'Dodge', 'Ford']
-    };
-    var pickerDependent = myApp.picker({
-        input: '#ks-picker-dependent',
-        rotateEffect: true,
-        formatValue: function (picker, values) {
-            return values[1];
-        },
-        cols: [
-            {
-                textAlign: 'left',
-                values: ['Japanese', 'German', 'American'],
-                onChange: function (picker, country) {
-                    if (picker.cols[1].replaceValues) {
-                        picker.cols[1].replaceValues(carVendors[country]);
-                    }
-                }
-            },
-            {
-                values: carVendors.Japanese,
-                width: 160,
-            },
-        ]
-    });
-
-    // Custom Toolbar
-    var pickerCustomToolbar = myApp.picker({
-        input: '#ks-picker-custom-toolbar',
-        rotateEffect: true,
-        toolbarTemplate: '<div class="toolbar">' +
-        '<div class="toolbar-inner">' +
-        '<div class="left">' +
-        '<a href="#" class="link toolbar-randomize-link">Randomize</a>' +
-        '</div>' +
-        '<div class="right">' +
-        '<a href="#" class="link close-picker">That\'s me</a>' +
-        '</div>' +
-        '</div>' +
-        '</div>',
-        cols: [
-            {
-                values: ['Mr', 'Ms'],
-            },
-            {
-                textAlign: 'left',
-                values: ('Super Lex Amazing Bat Iron Rocket Lex Cool Beautiful Wonderful Raining Happy Amazing Funny Cool Hot').split(' ')
-            },
-            {
-                values: ('Man Luthor Woman Boy Girl Person Cutie Babe Raccoon').split(' ')
-            },
-        ],
-        onOpen: function (picker) {
-            picker.container.find('.toolbar-randomize-link').on('click', function () {
-                var col0Values = picker.cols[0].values;
-                var col0Random = col0Values[Math.floor(Math.random() * col0Values.length)];
-
-                var col1Values = picker.cols[1].values;
-                var col1Random = col1Values[Math.floor(Math.random() * col1Values.length)];
-
-                var col2Values = picker.cols[2].values;
-                var col2Random = col2Values[Math.floor(Math.random() * col2Values.length)];
-
-                picker.setValue([col0Random, col1Random, col2Random]);
-            });
-        }
-    });
-
-    // Inline date-time
-    var pickerInline = myApp.picker({
-        input: '#ks-picker-date',
-        container: '#ks-picker-date-container',
-        toolbar: false,
-        rotateEffect: true,
-        value: [today.getMonth(), today.getDate(), today.getFullYear(), today.getHours(), (today.getMinutes() < 10 ? '0' + today.getMinutes() : today.getMinutes())],
-        onChange: function (picker, values, displayValues) {
-            var daysInMonth = new Date(picker.value[2], picker.value[0] * 1 + 1, 0).getDate();
-            if (values[1] > daysInMonth) {
-                picker.cols[1].setValue(daysInMonth);
-            }
-        },
-        formatValue: function (p, values, displayValues) {
-            return displayValues[0] + ' ' + values[1] + ', ' + values[2] + ' ' + values[3] + ':' + values[4];
-        },
-        cols: [
-            // Months
-            {
-                values: ('0 1 2 3 4 5 6 7 8 9 10 11').split(' '),
-                displayValues: ('January February March April May June July August September October November December').split(' '),
-                textAlign: 'left'
-            },
-            // Days
-            {
-                values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
-            },
-            // Years
-            {
-                values: (function () {
-                    var arr = [];
-                    for (var i = 1950; i <= 2030; i++) {
-                        arr.push(i);
-                    }
-                    return arr;
-                })(),
-            },
-            // Space divider
-            {
-                divider: true,
-                content: '&nbsp;&nbsp;'
-            },
-            // Hours
-            {
-                values: (function () {
-                    var arr = [];
-                    for (var i = 0; i <= 23; i++) {
-                        arr.push(i);
-                    }
-                    return arr;
-                })(),
-            },
-            // Divider
-            {
-                divider: true,
-                content: ':'
-            },
-            // Minutes
-            {
-                values: (function () {
-                    var arr = [];
-                    for (var i = 0; i <= 59; i++) {
-                        arr.push(i < 10 ? '0' + i : i);
-                    }
-                    return arr;
-                })(),
-            }
-        ]
-    });
-});
-
-/* ===== Progress Bars ===== */
-myApp.onPageInit('progressbar', function (page) {
-    $$('.ks-demo-progressbar-inline .button').on('click', function () {
-        var progress = $$(this).attr('data-progress');
-        var progressbar = $$('.ks-demo-progressbar-inline .progressbar');
-        myApp.setProgressbar(progressbar, progress);
-    });
-    $$('.ks-demo-progressbar-load-hide .button').on('click', function () {
-        var container = $$('.ks-demo-progressbar-load-hide p:first-child');
-        if (container.children('.progressbar').length) return; //don't run all this if there is a current progressbar loading
-
-        myApp.showProgressbar(container, 0);
-
-        // Simluate Loading Something
-        var progress = 0;
-
-        function simulateLoading() {
-            setTimeout(function () {
-                var progressBefore = progress;
-                progress += Math.random() * 20;
-                myApp.setProgressbar(container, progress);
-                if (progressBefore < 100) {
-                    simulateLoading(); //keep "loading"
-                }
-                else myApp.hideProgressbar(container); //hide
-            }, Math.random() * 200 + 200);
-        }
-
-        simulateLoading();
-    });
-    $$('.ks-demo-progressbar-overlay .button').on('click', function () {
-        // Add Directly To Body
-        var container = $$('body');
-        if (container.children('.progressbar, .progressbar-infinite').length) return; //don't run all this if there is a current progressbar loading
-
-        myApp.showProgressbar(container, 0);
-
-        // Simluate Loading Something
-        var progress = 0;
-
-        function simulateLoading() {
-            setTimeout(function () {
-                var progressBefore = progress;
-                progress += Math.random() * 20;
-                myApp.setProgressbar(container, progress);
-                if (progressBefore < 100) {
-                    simulateLoading(); //keep "loading"
-                }
-                else myApp.hideProgressbar(container); //hide
-            }, Math.random() * 200 + 200);
-        }
-
-        simulateLoading();
-    });
-    $$('.ks-demo-progressbar-infinite-overlay .button').on('click', function () {
-        // Add Directly To Body
-        var container = $$('body');
-        if (container.children('.progressbar, .progressbar-infinite').length) return; //don't run all this if there is a current progressbar loading
-        myApp.showProgressbar(container);
-        setTimeout(function () {
-            myApp.hideProgressbar();
-        }, 3000);
-    });
-    $$('.ks-demo-progressbar-infinite-multi-overlay .button').on('click', function () {
-        var container = $$('body');
-        if (container.children('.progressbar, .progressbar-infinite').length) return; //don't run all this if there is a current progressbar loading
-        myApp.showProgressbar(container, 'multi');
-        setTimeout(function () {
-            myApp.hideProgressbar();
-        }, 3000);
-    });
-});
-
-/* ===== Autocomplete ===== */
-myApp.onPageInit('autocomplete', function (page) {
-    // Fruits data demo array
-    var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
-
-    // Simple Dropdown
-    var autocompleteDropdownSimple = myApp.autocomplete({
-        input: '#autocomplete-dropdown',
-        openIn: 'dropdown',
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        }
-    });
-
-    // Dropdown with input expand
-    var autocompleteDropdownExpand = myApp.autocomplete({
-        input: '#autocomplete-dropdown-expand',
-        openIn: 'dropdown',
-        expandInput: true, // expand input
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        }
-    });
-
-    // Dropdown with all values
-    var autocompleteDropdownAll = myApp.autocomplete({
-        input: '#autocomplete-dropdown-all',
-        openIn: 'dropdown',
-        source: function (autocomplete, query, render) {
-            var results = [];
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        }
-    });
-
-    // Dropdown with placeholder
-    var autocompleteDropdownPlaceholder = myApp.autocomplete({
-        input: '#autocomplete-dropdown-placeholder',
-        openIn: 'dropdown',
-        dropdownPlaceholderText: 'Try to type "Apple"',
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        }
-    });
-
-    // Dropdown with ajax data
-    var autocompleteDropdownAjax = myApp.autocomplete({
-        input: '#autocomplete-dropdown-ajax',
-        openIn: 'dropdown',
-        preloader: true, //enable preloader
-        valueProperty: 'id', //object's "value" property name
-        textProperty: 'name', //object's "text" property name
-        limit: 20, //limit to 20 results
-        dropdownPlaceholderText: 'Try "JavaScript"',
-        expandInput: true, // expand input
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Show Preloader
-            autocomplete.showPreloader();
-            // Do Ajax request to Autocomplete data
-            $$.ajax({
-                url: 'js/autocomplete-languages.json',
-                method: 'GET',
-                dataType: 'json',
-                //send "query" to server. Useful in case you generate response dynamically
-                data: {
-                    query: query
-                },
-                success: function (data) {
-                    // Find matched items
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].name.toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(data[i]);
-                    }
-                    // Hide Preoloader
-                    autocomplete.hidePreloader();
-                    // Render items by passing array with result items
-                    render(results);
-                }
-            });
-        }
-    });
-
-    // Simple Standalone
-    var autocompleteStandaloneSimple = myApp.autocomplete({
-        openIn: 'page', //open in page
-        opener: $$('#autocomplete-standalone'), //link that opens autocomplete
-        backOnSelect: true, //go back after we select something
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        },
-        onChange: function (autocomplete, value) {
-            // Add item text value to item-after
-            $$('#autocomplete-standalone').find('.item-after').text(value[0]);
-            // Add item value to input value
-            $$('#autocomplete-standalone').find('input').val(value[0]);
-        }
-    });
-
-    // Standalone Popup
-    var autocompleteStandalonePopup = myApp.autocomplete({
-        openIn: 'popup', //open in page
-        opener: $$('#autocomplete-standalone-popup'), //link that opens autocomplete
-        backOnSelect: true, //go back after we select something
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        },
-        onChange: function (autocomplete, value) {
-            // Add item text value to item-after
-            $$('#autocomplete-standalone-popup').find('.item-after').text(value[0]);
-            // Add item value to input value
-            $$('#autocomplete-standalone-popup').find('input').val(value[0]);
-        }
-    });
-
-    // Multiple Standalone
-    var autocompleteStandaloneMultiple = myApp.autocomplete({
-        openIn: 'page', //open in page
-        opener: $$('#autocomplete-standalone-multiple'), //link that opens autocomplete
-        multiple: true, //allow multiple values
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        },
-        onChange: function (autocomplete, value) {
-            // Add item text value to item-after
-            $$('#autocomplete-standalone-multiple').find('.item-after').text(value.join(', '));
-            // Add item value to input value
-            $$('#autocomplete-standalone-multiple').find('input').val(value.join(', '));
-        }
-    });
-
-    // Standalone With Ajax
-    var autocompleteStandaloneAjax = myApp.autocomplete({
-        openIn: 'page', //open in page
-        opener: $$('#autocomplete-standalone-ajax'), //link that opens autocomplete
-        multiple: true, //allow multiple values
-        valueProperty: 'id', //object's "value" property name
-        textProperty: 'name', //object's "text" property name
-        limit: 50,
-        preloader: true, //enable preloader
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
-                render(results);
-                return;
-            }
-            // Show Preloader
-            autocomplete.showPreloader();
-            // Do Ajax request to Autocomplete data
-            $$.ajax({
-                url: 'js/autocomplete-languages.json',
-                method: 'GET',
-                dataType: 'json',
-                //send "query" to server. Useful in case you generate response dynamically
-                data: {
-                    query: query
-                },
-                success: function (data) {
-                    // Find matched items
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].name.toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(data[i]);
-                    }
-                    // Hide Preoloader
-                    autocomplete.hidePreloader();
-                    // Render items by passing array with result items
-                    render(results);
-                }
-            });
-        },
-        onChange: function (autocomplete, value) {
-            var itemText = [],
-                inputValue = [];
-            for (var i = 0; i < value.length; i++) {
-                itemText.push(value[i].name);
-                inputValue.push(value[i].id);
-            }
-            // Add item text value to item-after
-            $$('#autocomplete-standalone-ajax').find('.item-after').text(itemText.join(', '));
-            // Add item value to input value
-            $$('#autocomplete-standalone-ajax').find('input').val(inputValue.join(', '));
-        }
-    });
-});
-
-
-/* ===== Change statusbar bg when panel opened/closed ===== */
-$$('.panel-left').on('open', function () {
-    $$('.statusbar-overlay').addClass('with-panel-left');
-});
-$$('.panel-right').on('open', function () {
-    $$('.statusbar-overlay').addClass('with-panel-right');
-});
-$$('.panel-left, .panel-right').on('close', function () {
-    $$('.statusbar-overlay').removeClass('with-panel-left with-panel-right');
-});
-
-/* ===== Generate Content Dynamically ===== */
-var dynamicPageIndex = 0;
-function createContentPage() {
-    mainView.router.loadContent(
-        '<!-- Top Navbar-->' +
-        '<div class="navbar">' +
-        '  <div class="navbar-inner">' +
-        '    <div class="left sliding"><a href="#" class="back link"><i class="icon icon-back"></i><span>Back</span></a></div>' +
-        '    <div class="center sliding">Dynamic Page ' + (++dynamicPageIndex) + '</div>' +
-        '  </div>' +
-        '</div>' +
-        '<div class="pages">' +
-        '  <!-- Page, data-page contains page name-->' +
-        '  <div data-page="dynamic-content" class="page">' +
-        '    <!-- Scrollable page content-->' +
-        '    <div class="page-content">' +
-        '      <div class="content-block">' +
-        '        <div class="content-block-inner">' +
-        '          <p>Here is a dynamic page created on ' + new Date() + ' !</p>' +
-        '          <p>Go <a href="#" class="back">back</a> or generate <a href="#" class="ks-generate-page">one more page</a>.</p>' +
-        '        </div>' +
-        '      </div>' +
-        '    </div>' +
-        '  </div>' +
-        '</div>'
-    );
-    return;
+    var pageClass = character
+    var pageId = '.' + pageName + '.' + pageClass
+    $('.page:not(.' + pageName + ')[data-page=' + pageName + ']').addClass(pageClass).addClass(pageName)
+    return '.page[data-page=' + pageName + ']' + pageId
 }
-$$(document).on('click', '.ks-generate-page', createContentPage);
 
+$.ajaxSetup({
+    error: function (xhr, status, error) {
+        console.log(xhr.statusText)
+        myApp.hideIndicator()
+        myApp.pullToRefreshDone($$('.pull-to-refresh-content'));
+        toast(xhr.statusText == 'error' ? '網絡請求失敗' : xhr.statusText)
+    }
+});
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function onActivity(el, name) {
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
-
+function toActivity(el, name) {
     var vue = new Vue({
         el: el,
         data: {
@@ -1149,798 +256,679 @@ function onActivity(el, name) {
         },
         watch: {
             'activity': function (val, oldVal) {
-                var width = $(el + ".page-content").width()
+                var width = $(el + " .page-content").width()
                 var ratio = width / 375.0
-                $(el + ".page-content .banner").height(120 * ratio)
-                $(el + ".page-content .multiRect >div").height(165 * ratio)
-                $(el + ".page-content .rect >div").height(140 * ratio)
-                $(el + ".page-content .double img").height((width - 1) / 2)
+                $(el + " .page-content .banner").height(120 * ratio)
+                $(el + " .page-content .multiRect >div").height(165 * ratio)
+                $(el + " .page-content .rect >div").height(140 * ratio)
+                $(el + " .page-content .double img").height((width - 1) / 2)
                 myApp.initPageSwiper($$(el))
             },
+        },
+        methods: {
+            onItemClick: function (event, item) {
+                event.preventDefault()
+                if (item.type == 'goods') {
+                    toDetail(item.goods, false)
+                } else {
+                    myApp.getCurrentView().router.load({
+                        url: 'activity.html',
+                        query: {name: item.name}
+                    })
+                }
+            },
+            onCartClick: function (event, goods) {
+                event.preventDefault()
+                event.stopPropagation()
+                toAddCart(goods)
+            }
         }
+
     });
 
-    var ptrContent = $$(el + ".pull-to-refresh-content");
-    ptrContent.on('refresh', function (e) {
-        $.get(host+"/m/activity/query?name=" + name, function (result) {
+    var ptrContent = $$(el + " .pull-to-refresh-content");
+    ptrContent.on('refresh', function (event) {
+        $.get(host + "/m/activity/query", {name: name}, function (result) {
             if (result.code == 200) {
                 vue.activity = result.content
-                console.log("home load");
+                $(".view[data-page='activity']  .navbar-from-right-to-center .center").text(vue.activity.title)
+                $(".view[data-page='activity']  .navbar-on-center .center").text(vue.activity.title)
+                $(".view[data-page='activity']  .navbar-from-right-to-center .right").css({visibility: "visible"})
+                $(".view[data-page='activity']  .navbar-on-center .right").css({visibility: "visible"})
+                $(".navbar .search.text").text(result.extra.search)
             } else {
-                console.log(result.msg);
+                toast(result.msg);
             }
             myApp.pullToRefreshDone(ptrContent);
 
         });
 
     });
+    $(".view[data-page='activity']  .right.refresh").click(function (event) {
+        event.preventDefault()
+        $(el + ' iframe').attr('src', $(el + ' iframe').attr('src'));
+    })
     myApp.pullToRefreshTrigger(ptrContent)
+}
+
+function toScan() {
+    scan.recognize(function (doc) {
+        if (doc.indexOf('{') != -1 && doc.indexOf('}') != -1) {
+            var obj = JSON.parse(doc)
+            if (obj.type == 'goods') {
+                toDetail({
+                    goodsId: obj.content
+                }, true)
+            } else if (obj.type == 'order') {
+                myApp.getCurrentView().router.load({
+                    url: 'order.html'
+                })
+            } else if (obj.type == 'order-detail') {
+                toOrderDetail({_id: obj.content}, null, true)
+            } else if (obj.type == 'url') {
+                myApp.getCurrentView().router.load({
+                    url: 'web.html',
+                    query: {url: obj.content, name: '網頁'}
+                })
+            }
+        } else if (doc.indexOf('http') != -1 || doc.indexOf('https') != -1) {
+            myApp.getCurrentView().router.load({
+                url: 'web.html',
+                query: {url: doc, name: '網頁'}
+            })
+        }
+
+    }, function (error) {
+
+    })
 }
 
 myApp.onPageInit('home', function (page) {
     console.log('home init')
-    onActivity(".page[data-page='home'] ", 'home')
+    toActivity(generatePageId('home'), 'home')
+    $(".view[data-page='home']  .right.scan").click(function (event) {
+        event.preventDefault()
+        toScan()
+    })
 }).trigger()
+
+myApp.onPageInit('web', function (page) {
+    console.log('web init')
+    var pageId = generatePageId('web')
+    $(".view[data-page='web'] .navbar-on-right .center").text(page.query.name)
+    var vue = new Vue({
+        el: pageId,
+        data: {
+            url: page.query.url
+        },
+        methods: {}
+    });
+    $(".view[data-page='web']  .right.refresh").click(function (event) {
+        event.preventDefault()
+        $(pageId + ' iframe').attr('src', $(pageId + ' iframe').attr('src'));
+    })
+})
 
 myApp.onPageInit('activity', function (page) {
     var name = page.query.name
     console.log('activity ' + name + ' init')
-    $(".page:not(.activity)[data-page='activity']").addClass(name).addClass('activity')
-    var el = ".page." + name + "[data-page='activity'] "
-    onActivity(el, name)
+    toActivity(generatePageId('activity'), name)
 
 })
 
 myApp.onPageInit('activity-preview', function (page) {
     console.log('activity-preview init')
-    onActivity(".page[data-page='activity-preview'] ", 'activity-preview')
+    toActivity(generatePageId('activity-preview'), 'activity-preview')
 }).trigger()
 
-function onCart(el) {
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
+function toCart(el) {
     var vue = new Vue({
         el: el,
         data: {
-            goodss: [
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }
-            ]
+            carts: null,
+            checks: [],
+            checkAll: false,
+            price: '0',
+            quantity: '0'
+        },
+        watch: {
+            'checks': function (val, oldVal) {
+                this.checkAll = val.length == this.carts.length
+                var quantity = 0;
+                var price = 0;
+                var vue = this
+                this.carts.forEach(function (cart) {
+                    if ($.inArray(cart._id, vue.checks) >= 0) {
+                        price = parseFloat(price) + cart.price * cart.quantity
+                        quantity = parseInt(quantity) + parseInt(cart.quantity)
+                    }
+                })
+                this.price = price;
+                this.quantity = quantity
+            }
         },
         methods: {
-            onQuantityInput: function (event) {
+            onGoodsClick: function (event, cart) {
                 event.preventDefault()
-                event.stopPropagation()
+                toDetail({
+                    title: cart.title,
+                    goodsId: cart.goodsId,
+                    images: [cart.image],
+                    price: cart.price,
+                    quantity: '1'
+                }, true)
+            },
+            onQuantityInput: function (event, cart) {
+                this.onQuantity(event, cart)
 
             },
-            onQuantityDecrease: function (event) {
-                event.preventDefault()
-                event.stopPropagation()
-                var index = $(event.target).attr('value')
-                var goods = this.goodss[index]
-                goods.quantity--
+            onQuantityDecrease: function (event, cart) {
+                cart.quantity--
+                this.onQuantity(event, cart)
             },
-            onQuantityIncrease: function (event) {
+            onQuantityIncrease: function (event, cart) {
+                cart.quantity++
+                this.onQuantity(event, cart)
+            },
+            onQuantity: function (event, cart) {
                 event.preventDefault()
                 event.stopPropagation()
-                var index = $(event.target).attr('value')
-                var goods = this.goodss[index]
-                goods.quantity++
+                var vue = this
+                myApp.showIndicator()
+                $.post(host + "/m/cart/edit", cart, function (result) {
+                    if (result.code == 200) {
+                        if ($.inArray(cart._id, vue.checks) >= 0) {
+                            vue.checks.$remove(cart._id)
+                            vue.checks.push(cart._id)
+                        }
+                        console.log("edit cart load");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            },
+            onItemDelete: function (event, cart) {
+                event.preventDefault()
+                event.stopPropagation()
+                myApp.showIndicator()
+                $.get(host + "/m/cart/delete", {cartId: cart._id}, function (result) {
+                    if (result.code == 200) {
+                        vue.checks.$remove(cart._id)
+                        vue.carts.$remove(cart)
+                        console.log("cart delete");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            },
+            onCheckAll: function (event) {
+                event.preventDefault()
+                this.checks.splice(0, this.checks.length);
+                if (this.checkAll == false) {
+                    var vue = this
+                    this.carts.forEach(function (cart) {
+                        vue.checks.push(cart._id)
+                    })
+                }
+            },
+            onBuy: function (event) {
+                event.preventDefault()
+                if (this.checks.length > 0) {
+                    myApp.getCurrentView().router.load({
+                        url: 'buy.html',
+                        pushState: false,
+                        query: {cartIds: JSON.parse(JSON.stringify(this.checks))}
+                    })
+                }
             }
-
         }
     });
+
+    var ptrContent = $$(el + " .pull-to-refresh-content");
+    ptrContent.on('refresh', function (event) {
+        $.get(host + "/m/cart/queryList", {uid: user._id}, function (result) {
+            if (result.code == 200) {
+                vue.checks.splice(0, vue.checks.length);
+                vue.carts = result.content
+                console.log("cart load");
+            } else {
+                toast(result.msg);
+                ;
+            }
+            myApp.pullToRefreshDone(ptrContent);
+        });
+
+    });
+    myApp.pullToRefreshTrigger(ptrContent)
+
 }
 
 
-myApp.onPageInit('cart', function (page) {
+var onCartPageInit = myApp.onPageInit('cart', function (page) {
     console.log('cart init')
-    onCart(".page[data-page='cart']")
-}).trigger()
+    toCart(generatePageId('cart'))
+})
 
 
 myApp.onPageInit('cart-push', function (page) {
     console.log('cart-push init')
-    onCart(".page[data-page='cart-push']")
+    toCart(generatePageId('cart-push'))
 })
 
 
-myApp.onPageInit('category', function (page) {
+var onCategoryPageInit = myApp.onPageInit('category', function (page) {
     console.log('category init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-            el: ".page[data-page='category']",
-            data: {
-                categories: [
-                    {
-                        title: '饼干',
-                        goodss: [{
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            }]
-                    },
-                    {
-                        title: '蛋糕',
-                        goodss: [{
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            }]
-                    },
-                    {
-                        title: '饮料',
-                        goodss: [{
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            },
-                            {
-                                categoryId: '',
-                                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                                content: '',
-                                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                                quantity: '2',
-                                price: '20.2',
-                                sale: '100',
-                                date: '1462196014850'
-                            }]
-                    }
-                ],
-                category: {
-                    title: '饼干',
-                    goodss: [{
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }, {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }]
+        el: generatePageId('category'),
+        data: {
+            categories: null,
+            category: null
+        },
+        methods: {
+            onItemClick: function (event, category) {
+                var vue = this
+                vue.category = category
+                if (!(vue.category.goodss.length > 0)) {
+                    myApp.showIndicator()
+                    $.get(host + "/m/goods/queryList", {
+                        categoryId: vue.category.categoryId,
+                        uid: user._id
+                    }, function (result) {
+                        if (result.code == 200) {
+                            vue.category.goodss = result.content
+                            console.log("category goods load");
+                        } else {
+                            toast(result.msg);
+                            ;
+                        }
+                        myApp.hideIndicator()
+                    });
                 }
             },
+            onGoodsClick: function (event, goods) {
+                event.preventDefault()
+                toDetail(goods, false)
+            },
+            onCartClick: function (event, goods) {
+                event.preventDefault()
+                event.stopPropagation()
+                toAddCart(goods)
+            }
+        }
+    })
+    myApp.showIndicator()
+    $.get(host + "/m/category/queryList", {uid: user._id}, function (result) {
+        if (result.code == 200) {
+            vue.categories = result.content
+            vue.onItemClick(null, vue.categories[0])
+            $(".navbar .search.text").text(result.extra.search)
+            console.log("category load");
+        } else {
+            toast(result.msg);
+        }
+    });
 
-            methods: {}
-        })
-        ;
+    $(".view[data-page='category']  .right.scan").click(function (event) {
+        event.preventDefault()
+        toScan()
+    })
 
-}).trigger()
+})
 
 
 myApp.onPageInit('search', function (page) {
     console.log('search init')
-    $(".page[data-page='search'] .page-content img").height(($(".page[data-page='search'] .page-content").width() - 1) / 2)
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-        el: ".page[data-page='search']",
+        el: generatePageId('search'),
         data: {
-            goodss: [{
-                categoryId: '',
-                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                content: '',
-                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                quantity: '2',
-                price: '20.2',
-                sale: '100',
-                date: '1462196014850'
-            },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                },
-                {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }, {
-                    categoryId: '',
-                    title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                    content: '',
-                    images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                        'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                        'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                    quantity: '2',
-                    price: '20.2',
-                    sale: '100',
-                    date: '1462196014850'
-                }]
+            searchs: null,
         },
-        methods: {}
+        methods: {
+            onClear: function (event) {
+                event.preventDefault()
+                myApp.showIndicator()
+                $.get(host + "/m/search/clear", {uid: user._id}, function (result) {
+                    if (result.code == 200) {
+                        vue.searchs.recentSearchs = null
+                        console.log("search clear load");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            },
+            onTextClick: function (event, search) {
+                event.preventDefault()
+                $(".view[data-page='search']  input.search.text").val(search.title)
+                $(".view[data-page='search']  input.search.text").trigger($.Event('keypress', {keyCode: 13}));
+            },
+        }
+    });
+    myApp.showIndicator()
+    $.get(host + "/m/search/queryList", {uid: user._id}, function (result) {
+        if (result.code == 200) {
+            vue.searchs = result.content
+            console.log("search load");
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
+    });
+
+    $(".view[data-page='search']  input.search.text").keypress(function (event) {
+        if (event.keyCode == 13) {
+            var text = $(event.currentTarget).val()
+            if (text.length > 0) {
+                myApp.getCurrentView().router.load({
+                    url: 'search-detail.html',
+                    query: {text: text}
+                })
+            }
+
+        }
+
+    })
+
+})
+
+
+myApp.onPageInit('search-detail', function (page) {
+    console.log('search-detail init')
+    var pageId = generatePageId('search-detail')
+    $(pageId + " .page-content .goods img").height(($(pageId + " .page-content").width() - 1) / 2)
+    var vue = new Vue({
+        el: pageId,
+        data: {
+            goodss: null
+        },
+        methods: {
+            onGoodsClick: function (event, goods) {
+                event.preventDefault()
+                toDetail(goods, false)
+            },
+            onCartClick: function (event, goods) {
+                event.preventDefault()
+                event.stopPropagation()
+                toAddCart(goods)
+            }
+        }
+    });
+
+    $(".view[data-page='search-detail']  input.search.text").keypress(function (event) {
+        if (event.keyCode == 13) {
+            var text = $(event.currentTarget).val()
+            if (text.length > 0) {
+                myApp.showIndicator()
+                $.get(host + "/m/search/query", {text: text, uid: user._id}, function (result) {
+                    if (result.code == 200) {
+                        vue.goodss = result.content
+                        console.log("search load");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            } else {
+                vue.goodss = null
+            }
+
+        }
+
+    })
+    $(".view[data-page='search-detail']  input.search.text").val(page.query.text)
+    $(".view[data-page='search-detail']  input.search.text").trigger($.Event('keypress', {keyCode: 13}));
+
+})
+
+
+myApp.onPageInit('category-detail', function (page) {
+    console.log('category-detail init')
+    var pageId = generatePageId('category-detail')
+    $(pageId + " .page-content .goods img").height(($(pageId + " .page-content").width() - 1) / 2)
+    $(".view[data-page='category-detail']  .navbar-on-right .center").text(page.query.categoryName)
+    var vue = new Vue({
+        el: pageId,
+        data: {
+            goodss: null
+        },
+        methods: {
+            onGoodsClick: function (event, goods) {
+                event.preventDefault()
+                toDetail(goods, false)
+            },
+            onCartClick: function (event, goods) {
+                event.preventDefault()
+                event.stopPropagation()
+                toAddCart(goods)
+            }
+        }
+    });
+    myApp.showIndicator()
+    $.get(host + "/m/goods/queryList", {
+        categoryId: page.query.categoryId,
+        uid: user._id
+    }, function (result) {
+        if (result.code == 200) {
+            vue.goodss = result.content
+            console.log("category-detail  load");
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
     });
 
 
 })
 
-myApp.onPageInit('me', function (page) {
-    console.log('me init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
+
+myApp.onPageInit('shop-detail', function (page) {
+    console.log('shop-detail init')
+    var pageId = generatePageId('shop-detail')
+    $(pageId + " .page-content .goods img").height(($(pageId + " .page-content").width() - 1) / 2)
+    $(".view[data-page='shop-detail'] .navbar-on-right .center").text(page.query.shop)
     var vue = new Vue({
-        el: ".page[data-page='me']",
+        el: pageId,
         data: {
-            user: {
-                name: 'shadow',
-                phone: '15829383344'
+            goodss: null
+        },
+        methods: {
+            onGoodsClick: function (event, goods) {
+                event.preventDefault()
+                toDetail(goods, false)
+            },
+            onCartClick: function (event, goods) {
+                event.preventDefault()
+                event.stopPropagation()
+                toAddCart(goods)
             }
+        }
+    });
+    myApp.showIndicator()
+    $.get(host + "/m/goods/queryList", {
+        shop: page.query.shop,
+        uid: user._id
+    }, function (result) {
+        if (result.code == 200) {
+            vue.goodss = result.content
+            console.log("shop-detail  load");
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
+    });
+
+
+})
+
+
+var onMePageInit = myApp.onPageInit('me', function (page) {
+    console.log('me init')
+
+    var vue = new Vue({
+        el: generatePageId('me'),
+        data: {
+            user: user
         },
         methods: {}
     });
 
-}).trigger()
+})
 
 
 myApp.onPageInit('setting', function (page) {
     console.log('setting init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-        el: ".page[data-page='setting']",
+        el: generatePageId('setting'),
         data: {
-            user: {
-                name: 'shadow',
-                phone: '15829383344',
-                password: '111111'
-            }
+            user: user
         },
         methods: {}
     });
 
+})
+
+
+function toEditUser(user) {
+    myApp.showIndicator()
+    $.post(host + "/m/user/edit", user, function (result) {
+        if (result.code == 200) {
+            storeUser(result.content)
+            console.log("user edit load");
+            myApp.getCurrentView().router.back()
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
+    });
+
+}
+
+myApp.onPageInit('setting-name', function (page) {
+    console.log('setting-name init')
+    var vue = new Vue({
+        el: generatePageId('setting-name'),
+        data: {
+            user: JSON.parse(JSON.stringify(user)),
+        },
+        methods: {}
+    });
+    $(".view[data-page='setting-name']  .right").click(function (event) {
+        event.preventDefault()
+        toEditUser(vue.user)
+    })
+})
+
+
+myApp.onPageInit('setting-phone', function (page) {
+    console.log('setting-phone init')
+    var vue = new Vue({
+        el: generatePageId('setting-phone'),
+        data: {
+            user: JSON.parse(JSON.stringify(user)),
+        },
+        methods: {}
+    });
+    $(".view[data-page='setting-phone']  .right").click(function (event) {
+        event.preventDefault()
+        toEditUser(vue.user)
+    })
+})
+
+myApp.onPageInit('setting-password', function (page) {
+    console.log('setting-password init')
+    var vue = new Vue({
+        el: generatePageId('setting-password'),
+        data: {
+            user: JSON.parse(JSON.stringify(user)),
+        },
+        methods: {}
+    });
+    $(".view[data-page='setting-password']  .right").click(function (event) {
+        event.preventDefault()
+        toEditUser(vue.user)
+    })
 })
 
 
 myApp.onPageInit('buy', function (page) {
     console.log('buy init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-        el: ".page[data-page='buy']",
+        el: generatePageId('buy'),
         data: {
-            order: {
-                address: {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                },
-                title: '',
-                goodss: [
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    },
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    },
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    }],
-                quantity: '20',
-                price: '20.0',
-                state: '',//receipt,delivery,sign,completion,canceled
-                date: '1462196014850'
-            }
+            order: null
         },
-        methods: {}
+        methods: {
+            onAddressClick: function (event) {
+                event.preventDefault()
+                myApp.getCurrentView().router.load({
+                    url: 'address.html',
+                    query: {select: true, callback: this.onAddressSelect}
+                })
+            },
+            onCreateClick: function (event) {
+                event.preventDefault()
+                if (this.order.address) {
+                    myApp.showIndicator()
+                    $.post(host + "/m/order/create", {
+                        uid: user._id,
+                        order: JSON.stringify(this.order)
+                    }, function (result) {
+                        if (result.code == 200) {
+                            myApp.getCurrentView().router.back({
+                                animatePages: false
+                            })
+                            myApp.getCurrentView().router.load({
+                                url: 'order.html'
+                            })
+                            console.log("buy create load");
+                        } else {
+                            toast(result.msg);
+                            ;
+                        }
+                        myApp.hideIndicator()
+                    });
+                } else {
+                    toast('請選擇收貨地址')
+                }
+
+            },
+            onGoodsClick: function (event, item) {
+                event.preventDefault()
+                toDetail({
+                    title: item.title,
+                    goodsId: item.goodsId,
+                    images: [item.image],
+                    price: item.price,
+                    quantity: '1'
+                }, true)
+            },
+            onAddressSelect: function (address) {
+                this.$set('order.address', address)
+            }
+
+        }
+    });
+
+    myApp.showIndicator()
+    $.post(host + "/m/order/build", {uid: user._id, cartIds: page.query.cartIds}, function (result) {
+        if (result.code == 200) {
+            vue.order = result.content
+            console.log("buy load");
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
     });
 
 })
@@ -1948,405 +936,333 @@ myApp.onPageInit('buy', function (page) {
 
 myApp.onPageInit('order', function (page) {
     console.log('order init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
+    var pageId = generatePageId('order')
     var vue = new Vue({
-        el: ".page[data-page='order']",
+        el: pageId,
         data: {
-            orders: [
-                {
-                    address: {
-                        name: 'shadow',
-                        post: '123456',
-                        phone: '15829383344',
-                        content: '纽约市华人街区208号',
-                    },
-                    title: '',
-                    goodss: [
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }],
-                    quantity: '20',
-                    price: '20.0',
-                    state: 'receipt',//receipt,delivery,sign,completion,canceled
-                    date: '1462196014850'
-                },
-                {
-                    address: {
-                        name: 'shadow',
-                        post: '123456',
-                        phone: '15829383344',
-                        content: '纽约市华人街区208号',
-                    },
-                    title: '',
-                    goodss: [
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }],
-                    quantity: '20',
-                    price: '20.0',
-                    state: '',//receipt,delivery,sign,completion,canceled
-                    date: '1462196014850'
-                },
-                {
-                    address: {
-                        name: 'shadow',
-                        post: '123456',
-                        phone: '15829383344',
-                        content: '纽约市华人街区208号',
-                    },
-                    title: '',
-                    goodss: [
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }],
-                    quantity: '20',
-                    price: '20.0',
-                    state: 'receipt',//receipt,delivery,sign,completion,canceled
-                    date: '1462196014850'
-                },
-                {
-                    address: {
-                        name: 'shadow',
-                        post: '123456',
-                        phone: '15829383344',
-                        content: '纽约市华人街区208号',
-                    },
-                    title: '',
-                    goodss: [
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        },
-                        {
-                            categoryId: '',
-                            title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                            content: '',
-                            images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                                'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                                'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                            quantity: '2',
-                            price: '20.2',
-                            sale: '100',
-                            date: '1462196014850'
-                        }],
-                    quantity: '20',
-                    price: '20.0',
-                    state: 'receipt',//receipt,delivery,sign,completion,canceled
-                    date: '1462196014850'
-                }
-            ]
+            orders: null
         },
-        methods: {}
+        methods: {
+            onItemClick: function (event, order) {
+                event.preventDefault()
+                toOrderDetail(order, this.onRefresh, false)
+            },
+            onRefresh: function (order) {
+                var ptrContent = $$(pageId + " .pull-to-refresh-content");
+                myApp.pullToRefreshTrigger(ptrContent)
+            }
+        }
     });
+
+    var ptrContent = $$(pageId + " .pull-to-refresh-content");
+    ptrContent.on('refresh', function (event) {
+        $.get(host + "/m/order/queryList", {uid: user._id}, function (result) {
+            if (result.code == 200) {
+                vue.orders = result.content
+                console.log("order load");
+            } else {
+                toast(result.msg);
+                ;
+            }
+            myApp.pullToRefreshDone(ptrContent);
+
+        });
+
+    });
+    myApp.pullToRefreshTrigger(ptrContent)
 
 })
 
 
 myApp.onPageInit('order-detail', function (page) {
     console.log('order-detail init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-        el: ".page[data-page='order-detail']",
+        el: generatePageId('order-detail'),
         data: {
-            order: {
-                address: {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                },
-                title: '',
-                goodss: [
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    },
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    },
-                    {
-                        categoryId: '',
-                        title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                        content: '',
-                        images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                            'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                            'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                        quantity: '2',
-                        price: '20.2',
-                        sale: '100',
-                        date: '1462196014850'
-                    }],
-                quantity: '20',
-                price: '20.0',
-                state: 'receipt',//receipt,delivery,sign,completion,canceled
-                date: '1462196014850'
-            }
+            order: page.query.order
         },
-        methods: {}
+        methods: {
+            onCancelClick: function (event) {
+                event.preventDefault()
+                myApp.showIndicator()
+                var vue = this
+                $.get(host + "/m/order/cancel", {uid: user._id, orderId: this.order._id}, function (result) {
+                    if (result.code == 200) {
+                        page.query.callback(vue.order)
+                        myApp.getCurrentView().router.back()
+                        console.log("order cancel");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            },
+            onGoodsClick: function (event, item) {
+                event.preventDefault()
+                toDetail({
+                    title: item.title,
+                    goodsId: item.goodsId,
+                    images: [item.image],
+                    price: item.price,
+                    quantity: '1'
+                }, true)
+            }
+        }
     });
+
+    if (page.query.load) {
+        myApp.showIndicator()
+        $.get(host + "/m/order/query", {orderId: page.query.order._id}, function (result) {
+            if (result.code == 200) {
+                vue.order = result.content
+                console.log("order-detail load");
+            } else {
+                toast(result.msg);
+                ;
+            }
+            myApp.hideIndicator()
+        });
+    }
 
 })
 
 myApp.onPageInit('address', function (page) {
     console.log('address init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
+    var pageId = generatePageId('address')
     var vue = new Vue({
-        el: ".page[data-page='address']",
+        el: pageId,
         data: {
-            addresses: [{
-                name: 'shadow',
-                post: '123456',
-                phone: '15829383344',
-                content: '纽约市华人街区208号',
-            },
-                {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                }
-                ,
-                {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                }, {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                }, {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                }, {
-                    name: 'shadow',
-                    post: '123456',
-                    phone: '15829383344',
-                    content: '纽约市华人街区208号',
-                }
-            ]
+            addresses: null,
+            select: page.query.select
         },
-        methods: {}
+        methods: {
+            onItemClick: function (event, address) {
+                event.preventDefault()
+                if (this.select) {
+                    page.query.callback(JSON.parse(JSON.stringify(address)))
+                    myApp.getCurrentView().router.back()
+                } else {
+                    myApp.getCurrentView().router.load({
+                        url: 'address-edit.html',
+                        query: {address: address, callback: this.onRefresh}
+                    })
+                }
+
+            },
+            onItemEdit: function (event, address) {
+                event.preventDefault()
+                event.stopPropagation()
+                myApp.getCurrentView().router.load({
+                    url: 'address-edit.html',
+                    query: {address: address, callback: this.onRefresh}
+                })
+            },
+            onItemDelete: function (event, address) {
+                event.preventDefault()
+                event.stopPropagation()
+                myApp.showIndicator()
+                $.get(host + "/m/address/delete", {addressId: address._id}, function (result) {
+                    if (result.code == 200) {
+                        vue.addresses.$remove(address)
+                        console.log("addresses delete");
+                    } else {
+                        toast(result.msg);
+                        ;
+                    }
+                    myApp.hideIndicator()
+                });
+            },
+            onRefresh: function (address) {
+                var ptrContent = $$(pageId + " .pull-to-refresh-content");
+                myApp.pullToRefreshTrigger(ptrContent)
+            }
+        }
     });
+
+    var ptrContent = $$(pageId + " .pull-to-refresh-content");
+    ptrContent.on('refresh', function (event) {
+        $.get(host + "/m/address/queryList", {uid: user._id}, function (result) {
+            if (result.code == 200) {
+                vue.addresses = result.content
+                console.log("addresses load");
+            } else {
+                toast(result.msg);
+                ;
+            }
+            myApp.pullToRefreshDone(ptrContent);
+
+        });
+
+    });
+    myApp.pullToRefreshTrigger(ptrContent)
+
+    $(".view[data-page='address']  .right.add").click(function (event) {
+        event.preventDefault()
+        myApp.getCurrentView().router.load({
+            url: 'address-edit.html',
+            query: {callback: vue.onRefresh}
+        })
+    })
 
 })
 
 myApp.onPageInit('address-edit', function (page) {
     console.log('address-edit init')
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
     var vue = new Vue({
-        el: ".page[data-page='address-edit']",
+        el: generatePageId('address-edit'),
         data: {
-            address: {
-                name: 'shadow',
-                post: '123456',
-                phone: '15829383344',
-                content: '纽约市华人街区208号',
-            }
+            address: page.query.address ? page.query.address : {uid: user._id}
         },
         methods: {}
+
     });
+    $(".view[data-page='address-edit']  .right.edit").click(function (event) {
+        event.preventDefault()
+        // var nameReg = /^.{1,30}$/;
+        // if (!nameReg.test(vue.address.name)) {
+        //     toast('請輸入30字內名字');
+        //     return
+        // }
+        //
+        // var phoneReg = /^(\+97[\s]{0,1}[\-]{0,1}[\s]{0,1}1|0)50[\s]{0,1}[\-]{0,1}[\s]{0,1}[1-9]{1}[0-9]{6}$/;
+        // if (!phoneReg.test(vue.address.phone)) {
+        //     toast('請輸入有效手機號');
+        //     return
+        // }
+        //
+        // var postReg = /^[0-9]{5}(?:-[0-9]{4})?$/;
+        // if (!postReg.test(vue.address.post)) {
+        //     toast('請輸入有效郵政編碼');
+        //     return
+        // }
+        //
+        // var contentReg = /^.{1,200}$/;
+        // if (!contentReg.test(vue.address.content)) {
+        //     toast('請輸入大於5個字的有效詳細地址');
+        //     return
+        // }
+
+        myApp.showIndicator();
+        $.post(host + (vue.address._id ? '/m/address/edit' : '/m/address/add'), vue.address, function (result) {
+            if (result.code == 200) {
+                page.query.callback(vue.address)
+                console.log("address edit load")
+                myApp.getCurrentView().router.back()
+            } else {
+                toast(result.msg);
+            }
+            myApp.hideIndicator()
+        });
+    })
 
 })
 
+
+function toAddCart(goods) {
+    myApp.showIndicator()
+    var cart = {
+        uid: user._id,
+        goodsId: goods.goodsId,
+        title: goods.title,
+        price: goods.price,
+        quantity: goods.quantity,
+        image: goods.images[0]
+    }
+    $.post(host + "/m/cart/add", cart, function (result) {
+        if (result.code == 200) {
+            console.log("add cart load");
+            toast('添加購物車成功')
+        } else {
+            toast(result.msg);
+            ;
+        }
+        myApp.hideIndicator()
+    });
+}
+
+function toDetail(goods, load) {
+    myApp.getCurrentView().router.load({
+        url: 'detail.html',
+        query: {goods: JSON.parse(JSON.stringify(goods)), load: load}
+    })
+}
+
+function toOrderDetail(order, callback, load) {
+    myApp.getCurrentView().router.load({
+        url: 'order-detail.html',
+        query: {order: JSON.parse(JSON.stringify(order)), callback: callback, load: load}
+    })
+}
+
+
 myApp.onPageInit('detail', function (page) {
     console.log('detail init')
-    $(".page[data-page='detail'] .page-content .banner").height($(".page[data-page='detail'] .page-content").width())
-    Vue.filter('date', function (value) {
-        return new Date(parseInt(value)).format('yyyy年MM月dd日 hh时mm分ss秒')
-    })
+    var pageId = generatePageId('detail')
+    $(pageId + " .page-content .banner").height($(pageId + " .page-content").width())
+    var popWidth = $(".popover-qrcode").width()
+    $(".popover-qrcode").height(popWidth)
+    qrWidth = popWidth - 24
     var vue = new Vue({
-        el: ".page[data-page='detail']",
+        el: pageId,
         data: {
-            goods: {
-                categoryId: '',
-                title: '日本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g本GLICO 卡通妖怪手表曲奇饼干 焦糖味 69g',
-                content: '',
-                images: ['https://gd4.alicdn.com/imgextra/i4/TB16XXlKFXXXXXTXFXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zHK4cpXXXXX.XXXXXXXXXXXX_!!111448750.jpg_400x400.jpg',
-                    'https://gd1.alicdn.com/imgextra/i1/TB1_gFWHXXXXXcFaXXXXXXXXXXX_!!0-item_pic.jpg_400x400.jpg',
-                    'https://gd3.alicdn.com/imgextra/i3/111448750/TB2zT1VcpXXXXabXpXXXXXXXXXX_!!111448750.jpg_400x400.jpg'],
-                quantity: '1',
-                price: '20.2',
-                sale: '100',
-                date: '1462196014850'
-            }
+            goods: page.query.goods
         },
         methods: {
-            onPhoto: function (event) {
-                var index = $(event.target).attr('value')
-                /*=== Popup ===*/
+            onImageClick: function (event, index) {
                 var myPhotoBrowserPopup = myApp.photoBrowser({
                     photos: this.goods.images,
                     initialSlide: index,
                     type: 'popup'
                 });
                 myPhotoBrowserPopup.open();
+            },
+            onCategoryClick: function (event) {
+                event.preventDefault()
+                myApp.getCurrentView().router.load({
+                    url: 'category-detail.html',
+                    query: {categoryId: this.goods.categoryId, categoryName: this.goods.categoryName}
+                })
+            },
+            onShopClick: function (event) {
+                event.preventDefault()
+                myApp.getCurrentView().router.load({
+                    url: 'shop-detail.html',
+                    query: {shop: this.goods.shop}
+                })
+            },
+            onCartClick: function (event) {
+                event.preventDefault()
+                toAddCart(this.goods)
             }
+
         }
     });
-
+    if (page.query.load) {
+        myApp.showIndicator()
+        $.get(host + "/m/goods/query", {goodsId: page.query.goods.goodsId}, function (result) {
+            if (result.code == 200) {
+                vue.goods = result.content
+                $('.qrcode').empty()
+                $('.qrcode').qrcode({
+                    width: qrWidth,
+                    height: qrWidth,
+                    text: JSON.stringify({type: 'goods', content: vue.goods.goodsId})
+                })
+                console.log("detail load");
+            } else {
+                toast(result.msg);
+                ;
+            }
+            myApp.hideIndicator()
+        });
+    } else {
+        $('.qrcode').empty()
+        $('.qrcode').qrcode({
+            width: qrWidth,
+            height: qrWidth,
+            text: JSON.stringify({type: 'goods', content: vue.goods.goodsId})
+        })
+    }
 })
 

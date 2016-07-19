@@ -8,13 +8,14 @@
 <div class="pages navbar-through">
   <div data-page="order-detail" class="page no-tabbar">
     <div class="page-content">
-      <div class="list-block media-list state">
+      <div class="list-block media-list header">
         <ul>
           <li>
             <div class="item-content">
               <div class="item-inner">
-                <div class="text"><span class="text">訂單號：</span><span class="hint">{{order._id}}</span></div>
-                <div class="text"><span class="text">訂單狀態：</span><span class="price">{{order.state}}</span></div>
+                <div class="date text"><span class="text">訂單日期：</span><span class="hint">{{order.date | date}}</span></div>
+                <div class="id text"><span class="text">訂單號：</span><span class="hint">{{order._id}}</span></div>
+                <div class="state text"><span class="text">訂單狀態：</span><span class="price">{{order.state=='receipt'?'待接單 ':order.state=='delivery'?'待收貨 ':order.state=='sign'?'待簽收':order.state=='completion'?'完成訂單':order.state=='canceled'?'已取消':''}}</span></div>
               </div>
             </div>
           </li>
@@ -40,18 +41,15 @@
       <div class="content-block-title text">費用明細</div>
       <div class="list-block media-list goods">
         <ul>
-          <li v-for="goods in order.goodss">
-            <div class="item-content">
-              <div class="item-media"><img data-src="{{goods.images[0]}}" onerror="this.src='img/bg_image.png'" class="lazy lazy-fadeIn ks-demo-lazy"/></div>
+          <li v-for="item in order.items"><a id="" v-on:click="onGoodsClick($event,item)" class="item-content">
+              <div class="item-media"><img id="" v-bind:src="item.image" onerror="this.src='img/bg_image.png'" class="lazy lazy-fadeIn ks-demo-lazy"/></div>
               <div class="item-inner">
-                <div class="item-text text">{{goods.title}}</div>
+                <div class="item-text text">{{item.title}}</div>
                 <div class="item-title-row">
-                  <div class="subtitle">${{goods.price*goods.quantity}}</div>
-                  <div class="hint">{{goods.quantity}}份</div>
+                  <div class="subtitle">${{item.price*item.quantity}}</div>
+                  <div class="hint">{{item.quantity}}份</div>
                 </div>
-              </div>
-            </div>
-          </li>
+              </div></a></li>
         </ul>
       </div>
       <div class="content-block-title text">支付方式</div>
@@ -91,8 +89,8 @@
         </ul>
       </div>
     </div>
-    <div class="toolbar">
-      <div class="toolbar-inner"><a class="button submit">取消訂單</a></div>
+    <div v-if="order.state!='completion'&amp;&amp;order.state!='canceled'" class="toolbar">
+      <div class="toolbar-inner"><a id="" v-on:click="onCancelClick" class="button submit">取消訂單</a></div>
     </div>
   </div>
 </div>

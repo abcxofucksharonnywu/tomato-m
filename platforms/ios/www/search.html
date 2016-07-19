@@ -10,27 +10,15 @@
 <div class="pages navbar-through">
   <div data-page="search" class="page no-tabbar">
     <div class="page-content">
-      <div v-if="goodss.length&lt;=0" class="search">
+      <div class="search">
         <div class="recent">
-          <div class="row hint"><i class="iconfont icon-sousuo">最近搜索</i><i class="iconfont icon-shanchu"></i></div>
-          <div class="word hint"><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a></div>
+          <div class="row hint"><i class="iconfont icon-sousuo">最近搜索</i><i id="" v-on:click="onClear" class="iconfont icon-shanchu"></i></div>
+          <div class="word hint"><a v-for="search in searchs.recentSearchs" v-on:click="onTextClick($event,search)" class="button hint">{{search.title}}</a></div>
         </div>
         <div class="hot">
           <div class="row hint"><i class="iconfont icon-sousuo">熱門搜索</i></div>
-          <div class="word hint"><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a><a href="#" class="button hint">同品類</a></div>
+          <div class="word hint"><a v-for="search in searchs.hotSearchs" v-on:click="onTextClick($event,search)" class="button hint">{{search.title}}</a></div>
         </div>
-      </div>
-      <div v-else="v-else" class="list-block media-list goods">
-        <ul>
-          <li v-for="goods in goodss"><a href="detail.html" class="item-content">
-              <div class="item-media"><img data-src="{{goods.images[0]}}" onerror="this.src='img/bg_image.png'" class="lazy lazy-fadeIn ks-demo-lazy"/></div>
-              <div class="item-inner">
-                <div class="item-text text">{{goods.title}}</div>
-                <div class="item-title-row">
-                  <div class="price">${{goods.price}}</div><i class="iconfont icon-gouwuche price"></i>
-                </div>
-              </div></a></li>
-        </ul>
       </div>
     </div>
   </div>

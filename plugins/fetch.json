@@ -76,5 +76,31 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova-plugin-device": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/abcxofucksharonnywu/cordova-plugin-device.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-nativestorage": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-nativestorage"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-scan": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/abcxofucksharonnywu/cordova-plugin-scan.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

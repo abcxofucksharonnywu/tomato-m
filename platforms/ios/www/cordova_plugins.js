@@ -204,6 +204,40 @@ module.exports = [
         "clobbers": [
             "window.StatusBar"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-device/www/device.js",
+        "id": "cordova-plugin-device.device",
+        "pluginId": "cordova-plugin-device",
+        "clobbers": [
+            "device"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-nativestorage/www/mainHandle.js",
+        "id": "cordova-plugin-nativestorage.mainHandle",
+        "pluginId": "cordova-plugin-nativestorage",
+        "clobbers": [
+            "NativeStorage"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-nativestorage/www/LocalStorageHandle.js",
+        "id": "cordova-plugin-nativestorage.LocalStorageHandle",
+        "pluginId": "cordova-plugin-nativestorage"
+    },
+    {
+        "file": "plugins/cordova-plugin-nativestorage/www/NativeStorageError.js",
+        "id": "cordova-plugin-nativestorage.NativeStorageError",
+        "pluginId": "cordova-plugin-nativestorage"
+    },
+    {
+        "file": "plugins/cordova-plugin-scan/www/scan.js",
+        "id": "cordova-plugin-scan.scan",
+        "pluginId": "cordova-plugin-scan",
+        "clobbers": [
+            "scan"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -217,7 +251,10 @@ module.exports.metadata =
     "cordova-plugin-firebase": "1.0",
     "cordova-plugin-splashscreen": "3.2.2",
     "cordova-plugin-statusbar": "2.1.3",
-    "cordova-plugin-whitelist": "1.2.2"
+    "cordova-plugin-whitelist": "1.2.2",
+    "cordova-plugin-device": "1.1.3-dev",
+    "cordova-plugin-nativestorage": "2.0.2",
+    "cordova-plugin-scan": "1.0"
 }
 // BOTTOM OF METADATA
 });
