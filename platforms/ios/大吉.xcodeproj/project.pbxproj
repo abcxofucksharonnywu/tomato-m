@@ -35,9 +35,9 @@
 		78A6FE0CA13E4682A0CDBAC7 /* GCDWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A1EBA87BE4DECB454F8CE /* GCDWebServer.m */; };
 		7B7F5191F3EB43DE9F87279A /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BDAE97C4E85D4B6E99D6D2F7 /* libsqlite3.tbd */; };
 		7FE3909E59E44449B296740E /* GCDWebServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 626399C8B69845068F02CF75 /* GCDWebServerConnection.m */; };
+		80E1AD4E1D3E101B00177E95 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 80E1AD4D1D3E101B00177E95 /* GoogleService-Info.plist */; };
 		82691B5686F74C9BBDE1F002 /* GCDWebServerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D4B388BCBE43E4894D0382 /* GCDWebServerResponse.m */; };
 		8598E41D50BE477084F5E5C4 /* GoogleInterchangeUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51F489A00043433EB29CDDEA /* GoogleInterchangeUtilities.framework */; };
-		860646A2716F436A8712E7E9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4A9AA529CC2543B3B6E4A879 /* GoogleService-Info.plist */; };
 		8B3D05AB5A7F4394BD39A4E9 /* NativeStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = D4E4CF7FE4E24593B6D7F4C6 /* NativeStorage.m */; };
 		8B908F91D64D453EB34EBFF9 /* GCDWebServerFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 33CE43140FDE4CF48908FE36 /* GCDWebServerFunctions.m */; };
 		8E14EA2FE38E4B83A28B1396 /* GCDWebServerRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F50AD23E5FC641F792013F37 /* GCDWebServerRequest.m */; };
@@ -117,7 +117,6 @@
 		3870ACF3311B4468917CB933 /* GCDWebServerFunctions.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = GCDWebServerFunctions.h; path = "cordova-labs-local-webserver/GCDWebServerFunctions.h"; sourceTree = "<group>"; };
 		38807E011BAF4F1CBD5FB3A4 /* CDVDevice.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVDevice.h; path = "cordova-plugin-device/CDVDevice.h"; sourceTree = "<group>"; };
 		3E0F790C9A9C40DAAA2DCF7F /* GCDWebServerDataResponse.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = GCDWebServerDataResponse.h; path = "cordova-labs-local-webserver/GCDWebServerDataResponse.h"; sourceTree = "<group>"; };
-		4A9AA529CC2543B3B6E4A879 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		51F489A00043433EB29CDDEA /* GoogleInterchangeUtilities.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = GoogleInterchangeUtilities.framework; path = "大吉/Plugins/cordova-plugin-firebase/GoogleInterchangeUtilities.framework"; sourceTree = "<group>"; };
 		5281F459DB6746129D74B1B9 /* CDVLocalFilesystem.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVLocalFilesystem.h; path = "cordova-plugin-file/CDVLocalFilesystem.h"; sourceTree = "<group>"; };
 		5EADDADB992649B0A5893A25 /* GCDWebServerMultiPartFormRequest.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerMultiPartFormRequest.m; path = "cordova-labs-local-webserver/GCDWebServerMultiPartFormRequest.m"; sourceTree = "<group>"; };
@@ -131,6 +130,7 @@
 		7B1A1EBA87BE4DECB454F8CE /* GCDWebServer.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = GCDWebServer.m; path = "cordova-labs-local-webserver/GCDWebServer.m"; sourceTree = "<group>"; };
 		7C1D526A4C7B4B119ECA0AF0 /* CDVSplashScreen.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVSplashScreen.h; path = "cordova-plugin-splashscreen/CDVSplashScreen.h"; sourceTree = "<group>"; };
 		7EB071D49CCF4BC4814B3369 /* CDVScanViewController.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVScanViewController.h; path = "cordova-plugin-scan/CDVScanViewController.h"; sourceTree = "<group>"; };
+		80E1AD4D1D3E101B00177E95 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		83247754DA8E443B8057F949 /* CFNetwork.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		8657BA005A8E44BB8306A3E8 /* GCDWebServerErrorResponse.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = GCDWebServerErrorResponse.m; path = "cordova-labs-local-webserver/GCDWebServerErrorResponse.m"; sourceTree = "<group>"; };
 		8C96380697214E48BB899628 /* CDVWKWebViewUIDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVWKWebViewUIDelegate.m; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewUIDelegate.m"; sourceTree = "<group>"; };
@@ -257,7 +257,7 @@
 				0207DA571B56EA530066E2B4 /* Images.xcassets */,
 				3047A50E1AB8057F00498E2A /* config */,
 				8D1107310486CEB800E47090 /* 大吉-Info.plist */,
-				4A9AA529CC2543B3B6E4A879 /* GoogleService-Info.plist */,
+				80E1AD4D1D3E101B00177E95 /* GoogleService-Info.plist */,
 			);
 			name = Resources;
 			path = "大吉/Resources";
@@ -462,7 +462,7 @@
 				3047A5141AB8059700498E2A /* build.xcconfig in Resources */,
 				0207DA581B56EA530066E2B4 /* Images.xcassets in Resources */,
 				3047A5121AB8059700498E2A /* build-debug.xcconfig in Resources */,
-				860646A2716F436A8712E7E9 /* GoogleService-Info.plist in Resources */,
+				80E1AD4E1D3E101B00177E95 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,8 +544,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -582,8 +582,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: hua yue feng (VBETF68UM6)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: hua yue feng (VBETF68UM6)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -620,8 +620,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
@@ -632,7 +632,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "大吉";
-				PROVISIONING_PROFILE = "71bdee46-7ee8-4242-98f5-85e71a1006bc";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 			};
@@ -650,8 +650,8 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: hua yue feng (PSLB5QC6R9)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
@@ -661,7 +661,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "大吉";
-				PROVISIONING_PROFILE = "71bdee46-7ee8-4242-98f5-85e71a1006bc";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 			};

@@ -44,8 +44,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
     UIUserNotificationSettings *settings =
     [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
+    [application registerUserNotificationSettings:settings];
+    [application registerForRemoteNotifications];
     // [END register_for_notifications]
 
     
@@ -57,7 +57,30 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
     self.viewController = [[MainViewController alloc] init];
-    return [super application:application didFinishLaunchingWithOptions:launchOptions];
+    
+    Boolean result = [super application:application didFinishLaunchingWithOptions:launchOptions];
+    
+    NSDictionary*userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if(userInfo){
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self handlePush:userInfo show:NO];
+        });
+    }
+    
+    return result;
+}
+
+-(void)handlePush:(NSDictionary *)userInfo show:(Boolean)isShow{
+    NSString *str = [NSString stringWithFormat:@"{     \
+                     title:'%@',     \
+                     text:'%@',     \
+                     type:'%@',     \
+                     content:'%@',     \
+                     }",userInfo[@"aps"][@"alert"][@"title"],
+                     userInfo[@"aps"][@"alert"][@"body"],
+                     userInfo[@"type"],
+                     userInfo[@"content"]];
+    [self.viewController.commandDelegate evalJs:[NSString stringWithFormat:@"notification(%@,%@)",str,isShow?@"true":@"false"]];
 }
 
 // [START receive_message]
@@ -72,16 +95,8 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     
     // Pring full message.
     NSLog(@"%@", userInfo);
-    NSString *str = [NSString stringWithFormat:@"{     \
-                     title:'%@',     \
-                     text:'%@',     \
-                     type:'%@',     \
-                     content:'%@',     \
-                     }",userInfo[@"aps"][@"alert"][@"title"],
-                     userInfo[@"aps"][@"alert"][@"body"],
-                     userInfo[@"type"],
-                     userInfo[@"content"]];
-    [self.viewController.commandDelegate evalJs:[NSString stringWithFormat:@"notification(%@)",str]];
+    [self handlePush:userInfo show:application.applicationState == UIApplicationStateActive];
+    
 
 }
 // [END receive_message]
@@ -130,6 +145,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
 // [START disconnect_from_fcm]
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    [application setApplicationIconBadgeNumber:0];
     [[FIRMessaging messaging] disconnect];
     NSLog(@"Disconnected from FCM");
 }
