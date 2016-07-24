@@ -254,7 +254,8 @@ module.exports.metadata =
     "cordova-plugin-whitelist": "1.2.2",
     "cordova-plugin-device": "1.1.3-dev",
     "cordova-plugin-nativestorage": "2.0.2",
-    "cordova-plugin-scan": "1.0"
+    "cordova-plugin-scan": "1.0",
+    "cordova-plugin-crosswalk-webview": "1.8.0"
 }
 // BOTTOM OF METADATA
 });

@@ -36,12 +36,14 @@
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="Scan" >
-                <param name="android-package" value="org.apache.cordova.scan.Scan"/>
+            <feature name="scan" >
+                <param name="android-package" value="org.apache.cordova.scan.scan"/>
             </feature>
         </config-file>
         <source-file src="src/android/Scan.java" target-dir="src/org/apache/cordova/scan" />
+        <source-file src="src/android/ScanActivity.java" target-dir="src/org/apache/cordova/scan" />
         <framework src="src/android/scan.gradle" custom="true" type="gradleReference" />
+        <uses-permission android:name="android.permission.CAMERA" />
     </platform>
 
  

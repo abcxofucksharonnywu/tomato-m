@@ -78,13 +78,5 @@ lint.xml
 
 META-INF
 *.iml
-node_modules
-m/node_modules
-m/src
-m/build
-m/examples
-m/kitchen-sink-ios
-m/kitchen-sink-material
-public/.sass-cache
-public/scss
-.sass-cache
+platforms/ios/cordova
+platforms/android/cordova
