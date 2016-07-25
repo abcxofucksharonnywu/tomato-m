@@ -201,6 +201,10 @@ function notification(doc, show) {
 
 }
 
+function toBack() {
+    myApp.getCurrentView().router.back()
+}
+
 if (isApp) {
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {

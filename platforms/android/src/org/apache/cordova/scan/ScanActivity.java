@@ -1,6 +1,15 @@
-package org.apache.cordova.scan.scan;
+package org.apache.cordova.scan;
 
-public class SimpleScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.google.zxing.Result;
+
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
+public class ScanActivity extends Activity implements ZXingScannerView.ResultHandler {
+    public static final String TAG = "ScanActivity";
     private ZXingScannerView mScannerView;
 
     @Override

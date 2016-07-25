@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.bluetooth.BluetoothAdapter;
 import android.provider.Settings;
 
 public class Device extends CordovaPlugin {
@@ -61,10 +62,10 @@ public class Device extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
      *
-     * @param action            The action to execute.
-     * @param args              JSONArry of arguments for the plugin.
-     * @param callbackContext   The callback id used when calling back into JavaScript.
-     * @return                  True if the action was valid, false if not.
+     * @param action          The action to execute.
+     * @param args            JSONArry of arguments for the plugin.
+     * @param callbackContext The callback id used when calling back into JavaScript.
+     * @return True if the action was valid, false if not.
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if ("getDeviceInfo".equals(action)) {
@@ -74,11 +75,11 @@ public class Device extends CordovaPlugin {
             r.put("platform", this.getPlatform());
             r.put("model", this.getModel());
             r.put("manufacturer", this.getManufacturer());
-	        r.put("isVirtual", this.isVirtual());
+            r.put("isVirtual", this.isVirtual());
             r.put("serial", this.getSerialNumber());
+            r.put("name", this.getName());
             callbackContext.success(r);
-        }
-        else {
+        } else {
             return false;
         }
         return true;
@@ -133,6 +134,12 @@ public class Device extends CordovaPlugin {
         return serial;
     }
 
+    public String getName() {
+        BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+        String deviceName = myDevice != null ? myDevice.getName() : null;
+        return deviceName;
+    }
+
     /**
      * Get the OS version.
      *
@@ -167,8 +174,8 @@ public class Device extends CordovaPlugin {
     }
 
     public boolean isVirtual() {
-	return android.os.Build.FINGERPRINT.contains("generic") ||
-	    android.os.Build.PRODUCT.contains("sdk");
+        return android.os.Build.FINGERPRINT.contains("generic") ||
+                android.os.Build.PRODUCT.contains("sdk");
     }
 
 }

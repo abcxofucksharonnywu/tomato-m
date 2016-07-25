@@ -17,19 +17,20 @@
     <allow-intent href="geo:*" />
     <access origin="*" />
     <allow-navigation href="*" />
-    <icon src="resources/icon.png" />
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="xwalkVersion" value="xwalk_core_library_beta:18+" />
         <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
         <preference name="xwalkMode" value="embedded" />
         <preference name="xwalkMultipleApk" value="true" />
-        <splash src="resources/android-splash.png" />
+        <icon src="resources/icon.png" density="xxxhdpi"/>
+        <splash src="resources/android-splash.png" density="xxxhdpi"/>
     </platform>
     <platform name="ios">
         <content src="http://localhost:0" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
+        <icon src="resources/icon.png" />
         <splash height="960" src="resources/ios-splash-0.png" width="640" />
         <splash height="1136" src="resources/ios-splash-1.png" width="640" />
         <splash height="1334" src="resources/ios-splash-2.png" width="750" />

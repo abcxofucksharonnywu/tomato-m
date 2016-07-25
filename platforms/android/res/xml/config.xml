@@ -21,7 +21,7 @@
         <param name="android-package" value="NativeStorage" />
     </feature>
     <feature name="scan">
-        <param name="android-package" value="org.apache.cordova.scan.scan" />
+        <param name="android-package" value="org.apache.cordova.scan.Scan" />
     </feature>
     <feature name="SplashScreen">
         <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
@@ -36,7 +36,8 @@
         <param name="onload" value="true" />
     </feature>
     <allow-intent href="market:*" />
-    <splash src="resources/android-splash.png" />
+    <icon density="xxxhdpi" src="resources/icon.png" />
+    <splash density="xxxhdpi" src="resources/android-splash.png" />
     <name>大吉</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
@@ -52,7 +53,6 @@
     <allow-intent href="geo:*" />
     <access origin="*" />
     <allow-navigation href="*" />
-    <icon src="resources/icon.png" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="xwalkVersion" value="xwalk_core_library_beta:18+" />
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
