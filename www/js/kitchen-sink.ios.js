@@ -201,13 +201,18 @@ function notification(doc, show) {
 
 }
 
-function toBack() {
-    myApp.getCurrentView().router.back()
-}
 
 if (isApp) {
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
+        document.addEventListener("backbutton", function (event) {
+            myApp.hideIndicator()
+            if (myApp.getCurrentView().history.length > 1) {
+                myApp.getCurrentView().router.back()
+            } else {
+                navigator.app.exitApp()
+            }
+        }, false);
         userInit()
     }
 } else {
@@ -580,6 +585,7 @@ var onCategoryPageInit = myApp.onPageInit('category', function (page) {
             $(".navbar .search.text").text(result.extra.search)
             console.log("category load");
         } else {
+            view2Init = false
             toast(result.msg);
         }
     });

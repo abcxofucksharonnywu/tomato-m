@@ -213,7 +213,7 @@ public class SplashScreen extends CordovaPlugin {
                     final int fadeSplashScreenDuration = getFadeDuration();
                     // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
                     if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
-                        AlphaAnimation fadeOut = new AlphaAnimation(1, 0);
+                        AlphaAnimation fadeOut = new AlphaAnimation(1, 1);
                         fadeOut.setInterpolator(new DecelerateInterpolator());
                         fadeOut.setDuration(fadeSplashScreenDuration);
 
@@ -276,7 +276,6 @@ public class SplashScreen extends CordovaPlugin {
                 // Get reference to display
                 Display display = cordova.getActivity().getWindowManager().getDefaultDisplay();
                 Context context = webView.getContext();
-
                 // Use an ImageView to render the image because of its flexible scaling options.
                 splashImageView = new ImageView(context);
                 splashImageView.setImageResource(drawableId);
@@ -287,7 +286,7 @@ public class SplashScreen extends CordovaPlugin {
                 splashImageView.setMinimumWidth(display.getWidth());
 
                 // TODO: Use the background color of the webView's parent instead of using the preference.
-                splashImageView.setBackgroundColor(preferences.getInteger("backgroundColor", Color.WHITE));
+                splashImageView.setBackgroundColor(preferences.getInteger("backgroundColor", Color.BLACK));
 
                 if (isMaintainAspectRatio()) {
                     // CENTER_CROP scale mode is equivalent to CSS "background-size:cover"
