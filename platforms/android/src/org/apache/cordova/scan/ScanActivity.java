@@ -1,6 +1,7 @@
 package org.apache.cordova.scan;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -39,6 +40,10 @@ public class ScanActivity extends Activity implements ZXingScannerView.ResultHan
         Log.v(TAG, rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode, pdf417 etc.)
 
         // If you would like to resume scanning, call this method below:
-        mScannerView.resumeCameraPreview(this);
+//        mScannerView.resumeCameraPreview(this);
+        Intent intent = new Intent();
+        intent.putExtra("content", rawResult.getText());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

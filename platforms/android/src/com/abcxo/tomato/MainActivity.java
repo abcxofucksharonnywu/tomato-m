@@ -19,18 +19,58 @@
 
 package com.abcxo.tomato;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
-import org.apache.cordova.*;
+import android.os.Handler;
 
-public class MainActivity extends CordovaActivity
-{
+import org.apache.cordova.CordovaActivity;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.firebase.Utils;
+import org.json.JSONObject;
+
+public class MainActivity extends CordovaActivity {
+    public static final String TAG = "MainActivity";
+    public static CordovaWebView webView;
+
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
+        webView = appView;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handlePush(getIntent());
+            }
+        }, 2000);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Utils.registerToken();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handlePush(intent);
+
+    }
+
+    private void handlePush(Intent intent) {
+        try {
+            if (intent.getExtras() != null) {
+                JSONObject object = new JSONObject();
+                object.put("title", "新消息");
+                object.put("text", "新消息");
+                object.put("type", intent.getExtras().getString("type"));
+                object.put("content", intent.getExtras().getString("content"));
+                Utils.handlePush(object.toString(), false);
+            }
+        } catch (Exception e) {
+
+        }
+    }
 }

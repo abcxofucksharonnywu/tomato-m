@@ -18,16 +18,19 @@
 */
 package org.apache.cordova.scan;
 
+import android.content.Intent;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class Scan extends CordovaPlugin {
     public static final String TAG = "Scan";
+    public static final int REQ_CODE = 0x01;
+    private CallbackContext callbackContext;
 
     /**
      * Constructor.
@@ -49,28 +52,33 @@ public class Scan extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
      *
-     * @param action            The action to execute.
-     * @param args              JSONArry of arguments for the plugin.
-     * @param callbackContext   The callback id used when calling back into JavaScript.
-     * @return                  True if the action was valid, false if not.
+     * @param action          The action to execute.
+     * @param args            JSONArry of arguments for the plugin.
+     * @param callbackContext The callback id used when calling back into JavaScript.
+     * @return True if the action was valid, false if not.
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if ("recognize".equals(action)) {
-            JSONObject r = new JSONObject();
-//            r.put("uuid", Device.uuid);
-//            r.put("version", this.getOSVersion());
-//            r.put("platform", this.getPlatform());
-//            r.put("model", this.getModel());
-//            r.put("manufacturer", this.getManufacturer());
-//            r.put("isVirtual", this.isVirtual());
-//            r.put("serial", this.getSerialNumber());
-            callbackContext.success(r);
-        }
-        else {
+            this.callbackContext = callbackContext;
+            cordova.startActivityForResult(this, new Intent(cordova.getActivity(), ScanActivity.class), REQ_CODE);
+        } else {
             return false;
         }
         return true;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQ_CODE) {
+            try {
+                callbackContext.success(intent.getStringExtra("content"));
+            } catch (Exception e) {
+                callbackContext.error("識別出錯");
+            }
+        }
+
+
+    }
 }
 
