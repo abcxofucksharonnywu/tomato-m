@@ -257,11 +257,17 @@ function generatePageId(pageName) {
 }
 
 $.ajaxSetup({
+    beforeSend: function (jqXHR, settings) {
+        jqXHR.url = settings.url;
+    },
     error: function (xhr, status, error) {
         console.log(xhr.statusText)
         myApp.hideIndicator()
         myApp.pullToRefreshDone($$('.pull-to-refresh-content'));
         toast(xhr.statusText == 'error' ? '網絡請求失敗' : xhr.statusText)
+        if (xhr.url.indexOf('/m/category/queryList') != -1) {
+            view2Init = false
+        }
     }
 });
 
