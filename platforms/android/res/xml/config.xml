@@ -36,7 +36,7 @@
         <param name="onload" value="true" />
     </feature>
     <allow-intent href="market:*" />
-    <icon density="xxxhdpi" src="resources/icon.png" />
+    <icon density="xxxhdpi" src="resources/icon-android.png" />
     <splash density="xxxhdpi" src="resources/android-splash.png" />
     <name>大吉</name>
     <description>
