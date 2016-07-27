@@ -30,7 +30,7 @@
         <content src="http://localhost:0" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-        <icon src="resources/icon.png" />
+        <icon src="resources/icon-android.png" />
         <splash height="960" src="resources/ios-splash-0.png" width="640" />
         <splash height="1136" src="resources/ios-splash-1.png" width="640" />
         <splash height="1334" src="resources/ios-splash-2.png" width="750" />
