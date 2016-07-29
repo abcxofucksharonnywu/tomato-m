@@ -45,8 +45,8 @@ var view4 = myApp.addView('#view-4', {
 });
 
 
-var host = 'http://www.dajitogo.com:3000'
-// var host = 'http://localhost:3000'
+// var host = 'http://www.dajitogo.com:3000'
+var host = 'http://localhost:3000'
 
 Date.prototype.format = function (format) {
     var o = {
@@ -74,6 +74,15 @@ Vue.filter('date', function (value) {
 Vue.filter('time', function (value) {
     return new Date(parseInt(value)).format('MM月dd日 hh:mm')
 })
+
+
+var gVue = new Vue({
+    el: 'toolbar.tabbar.tabbar-labels',
+    data: {
+        badge3: 0
+    },
+    methods: {}
+});
 
 
 var isApp = typeof cordova !== 'undefined'
@@ -236,7 +245,7 @@ $(".tab-link").click(function (event) {
         }
     } else if (href == '#view-3') {
         if (!view3Init) {
-            view3Init = true
+            // view3Init = true
             onCartPageInit.trigger()
         }
     } else if (href == '#view-4') {
@@ -1199,6 +1208,7 @@ function toAddCart(goods) {
     }
     $.post(host + "/m/cart/add", cart, function (result) {
         if (result.code == 200) {
+            gVue.badge3++;
             console.log("add cart load");
             toast('添加購物車成功')
         } else {
