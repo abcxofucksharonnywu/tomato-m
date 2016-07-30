@@ -45,8 +45,8 @@ var view4 = myApp.addView('#view-4', {
 });
 
 
-var host = 'http://www.dajitogo.com:3000'
-// var host = 'http://localhost:3000'
+ var host = 'http://www.dajitogo.com:3000'
+//var host = 'http://localhost:3000'
 
 Date.prototype.format = function (format) {
     var o = {
@@ -74,6 +74,15 @@ Vue.filter('date', function (value) {
 Vue.filter('time', function (value) {
     return new Date(parseInt(value)).format('MM月dd日 hh:mm')
 })
+
+
+var gVue = new Vue({
+    el: '.toolbar.tabbar.tabbar-labels',
+    data: {
+        badge3: 0
+    },
+    methods: {}
+});
 
 
 var isApp = typeof cordova !== 'undefined'
@@ -238,6 +247,8 @@ $(".tab-link").click(function (event) {
         if (!view3Init) {
             view3Init = true
             onCartPageInit.trigger()
+        } else {
+            onCartPageReInit.trigger()
         }
     } else if (href == '#view-4') {
         if (!view4Init) {
@@ -536,7 +547,17 @@ function toCart(el) {
 
 var onCartPageInit = myApp.onPageInit('cart', function (page) {
     console.log('cart init')
+    gVue.badge3 = 0
     toCart(generatePageId('cart'))
+})
+
+var onCartPageReInit = myApp.onPageReinit('cart', function (page) {
+    console.log('cart reinit')
+    if (gVue.badge3 > 0) {
+        gVue.badge3 = 0
+        var ptrContent = $$(".page[data-page='cart'] .pull-to-refresh-content");
+        myApp.pullToRefreshTrigger(ptrContent)
+    }
 })
 
 
@@ -905,25 +926,31 @@ myApp.onPageInit('buy', function (page) {
             onCreateClick: function (event) {
                 event.preventDefault()
                 if (this.order.address) {
-                    myApp.showIndicator()
-                    $.post(host + "/m/order/create", {
-                        uid: user._id,
-                        order: JSON.stringify(this.order)
-                    }, function (result) {
-                        if (result.code == 200) {
-                            myApp.getCurrentView().router.back({
-                                animatePages: false
-                            })
-                            myApp.getCurrentView().router.load({
-                                url: 'order.html'
-                            })
-                            console.log("buy create load");
-                        } else {
-                            toast(result.msg);
-                            ;
-                        }
-                        myApp.hideIndicator()
-                    });
+                    if (this.order.items.length > 0) {
+                        myApp.showIndicator()
+                        var vue = this
+                        $.post(host + "/m/order/create", {
+                            uid: user._id,
+                            order: JSON.stringify(this.order)
+                        }, function (result) {
+                            if (result.code == 200) {
+                                gVue.badge3 = vue.order.items.length
+                                myApp.getCurrentView().router.back({
+                                    animatePages: false
+                                })
+                                myApp.getCurrentView().router.load({
+                                    url: 'order.html'
+                                })
+                                console.log("buy create load");
+                            } else {
+                                toast(result.msg);
+
+                            }
+                            myApp.hideIndicator()
+                        });
+                    } else {
+                        toast('請選擇商品')
+                    }
                 } else {
                     toast('請選擇收貨地址')
                 }
@@ -1199,6 +1226,7 @@ function toAddCart(goods) {
     }
     $.post(host + "/m/cart/add", cart, function (result) {
         if (result.code == 200) {
+            gVue.badge3++;
             console.log("add cart load");
             toast('添加購物車成功')
         } else {
