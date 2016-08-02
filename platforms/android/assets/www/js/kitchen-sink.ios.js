@@ -45,8 +45,8 @@ var view4 = myApp.addView('#view-4', {
 });
 
 
- var host = 'http://www.dajitogo.com:3000'
-//var host = 'http://localhost:3000'
+// var host = 'http://www.dajitogo.com:3000'
+var host = 'http://localhost:3000'
 
 Date.prototype.format = function (format) {
     var o = {
@@ -1025,6 +1025,14 @@ myApp.onPageInit('order', function (page) {
     });
     myApp.pullToRefreshTrigger(ptrContent)
 
+    $(".view[data-page='order']  .right.home").click(function (event) {
+        event.preventDefault()
+        myApp.getCurrentView().router.back({
+            url: 'index.html',
+            force: true
+        })
+    })
+
 })
 
 
@@ -1174,29 +1182,31 @@ myApp.onPageInit('address-edit', function (page) {
     });
     $(".view[data-page='address-edit']  .right.edit").click(function (event) {
         event.preventDefault()
-        // var nameReg = /^.{1,30}$/;
-        // if (!nameReg.test(vue.address.name)) {
-        //     toast('請輸入30字內名字');
-        //     return
-        // }
-        //
+        var nameReg = /^.{1,50}$/;
+        if (!nameReg.test(vue.address.name)) {
+            toast('請輸入30字內名字');
+            return
+        }
+
         // var phoneReg = /^(\+97[\s]{0,1}[\-]{0,1}[\s]{0,1}1|0)50[\s]{0,1}[\-]{0,1}[\s]{0,1}[1-9]{1}[0-9]{6}$/;
-        // if (!phoneReg.test(vue.address.phone)) {
-        //     toast('請輸入有效手機號');
-        //     return
-        // }
-        //
+        var phoneReg = /^.{1,50}$/;
+        if (!phoneReg.test(vue.address.phone)) {
+            toast('請輸入有效手機號');
+            return
+        }
+
         // var postReg = /^[0-9]{5}(?:-[0-9]{4})?$/;
-        // if (!postReg.test(vue.address.post)) {
-        //     toast('請輸入有效郵政編碼');
-        //     return
-        // }
-        //
-        // var contentReg = /^.{1,200}$/;
-        // if (!contentReg.test(vue.address.content)) {
-        //     toast('請輸入大於5個字的有效詳細地址');
-        //     return
-        // }
+        var postReg = /^.{1,50}$/;
+        if (!postReg.test(vue.address.post)) {
+            toast('請輸入有效郵政編碼');
+            return
+        }
+
+        var contentReg = /^.{5,300}$/;
+        if (!contentReg.test(vue.address.content)) {
+            toast('請輸入大於5個字的有效詳細地址');
+            return
+        }
 
         myApp.showIndicator();
         $.post(host + (vue.address._id ? '/m/address/edit' : '/m/address/add'), vue.address, function (result) {
@@ -1214,7 +1224,7 @@ myApp.onPageInit('address-edit', function (page) {
 })
 
 
-function toAddCart(goods) {
+function toAddCart(goods, callback) {
     myApp.showIndicator()
     var cart = {
         uid: user._id,
@@ -1232,6 +1242,9 @@ function toAddCart(goods) {
         } else {
             toast(result.msg);
 
+        }
+        if (callback) {
+            callback(result.code == 200)
         }
         myApp.hideIndicator()
     });
@@ -1289,7 +1302,11 @@ myApp.onPageInit('detail', function (page) {
             },
             onCartClick: function (event) {
                 event.preventDefault()
-                toAddCart(this.goods)
+                toAddCart(this.goods, function (success) {
+                    if (success) {
+                        myApp.getCurrentView().router.back()
+                    }
+                })
             }
 
         }
