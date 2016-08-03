@@ -21,7 +21,7 @@
         <param name="android-package" value="NativeStorage" />
     </feature>
     <feature name="scan">
-        <param name="android-package" value="org.apache.cordova.scan.scan" />
+        <param name="android-package" value="org.apache.cordova.scan.Scan" />
     </feature>
     <feature name="SplashScreen">
         <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />

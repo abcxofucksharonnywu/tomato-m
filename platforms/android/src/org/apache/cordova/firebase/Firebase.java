@@ -18,18 +18,38 @@
 */
 package org.apache.cordova.firebase;
 
-import java.util.TimeZone;
+import android.os.Bundle;
+import android.util.Log;
 
-import org.apache.cordova.CordovaWebView;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaInterface;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.provider.Settings;
+import java.util.Iterator;
 
 public class Firebase extends CordovaPlugin {
     public static final String TAG = "Firebase";
+
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+        if ("log".equals(action)) {
+            String logName = args.optString(0);
+            JSONObject obj = args.optJSONObject(1);
+            Iterator keys = obj.keys();
+            Bundle params = new Bundle();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                params.putString(key, obj.optString(key));
+            }
+            Log.v("log-" + logName, params.toString());
+            FirebaseAnalytics.getInstance(cordova.getActivity()).logEvent(logName, params);
+            callbackContext.success();
+        } else {
+            return false;
+        }
+        return true;
+    }
 }
