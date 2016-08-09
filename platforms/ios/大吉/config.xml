@@ -29,7 +29,7 @@
         <param name="ios-package" value="CDVWKWebViewEngine" />
     </feature>
     <feature name="Firebase">
-        <param name="ios-package" value="CDFirebase" />
+        <param name="ios-package" value="CDVFirebase" />
     </feature>
     <feature name="SplashScreen">
         <param name="ios-package" value="CDVSplashScreen" />
@@ -63,10 +63,10 @@
     <allow-intent href="geo:*" />
     <access origin="*" />
     <allow-navigation href="*" />
-    <icon src="resources/icon.png" />
     <content src="http://localhost:0" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
+    <icon src="resources/icon.png" />
     <splash height="960" src="resources/ios-splash-0.png" width="640" />
     <splash height="1136" src="resources/ios-splash-1.png" width="640" />
     <splash height="1334" src="resources/ios-splash-2.png" width="750" />

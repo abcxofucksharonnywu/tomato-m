@@ -44,17 +44,17 @@
                       </div>
                       <div v-if="layout.type=='multiRect'" class="layout multiRect">
                         <div>
-                          <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[0].img" onerror="this.src='img/bg_image.png'"></a></div>
-                          <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[1].img" onerror="this.src='img/bg_image.png'"></a></div>
+                          <div><a id="" v-on:click="onItemClick($event,layout.items[0])"><img id="" v-bind:src="layout.items[0].img" onerror="this.src='img/bg_image.png'"></a></div>
+                          <div><a id="" v-on:click="onItemClick($event,layout.items[1])"><img id="" v-bind:src="layout.items[1].img" onerror="this.src='img/bg_image.png'"></a></div>
                         </div>
                         <div>
-                          <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[2].img" onerror="this.src='img/bg_image.png'"></a></div>
-                          <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[3].img" onerror="this.src='img/bg_image.png'"></a></div>
-                          <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[4].img" onerror="this.src='img/bg_image.png'"></a></div>
+                          <div><a id="" v-on:click="onItemClick($event,layout.items[2])"><img id="" v-bind:src="layout.items[2].img" onerror="this.src='img/bg_image.png'"></a></div>
+                          <div><a id="" v-on:click="onItemClick($event,layout.items[3])"><img id="" v-bind:src="layout.items[3].img" onerror="this.src='img/bg_image.png'"></a></div>
+                          <div><a id="" v-on:click="onItemClick($event,layout.items[4])"><img id="" v-bind:src="layout.items[4].img" onerror="this.src='img/bg_image.png'"></a></div>
                         </div>
                       </div>
                       <div v-if="layout.type=='rect'" class="layout rect">
-                        <div><a id="" v-on:click="onItemClick($event,item)"><img id="" v-bind:src="layout.items[0].img" onerror="this.src='img/bg_image.png'"></a></div>
+                        <div><a id="" v-on:click="onItemClick($event,layout.items[0])"><img id="" v-bind:src="layout.items[0].img" onerror="this.src='img/bg_image.png'"></a></div>
                       </div>
                       <div v-if="layout.type==='double'" class="layout double">
                         <div class="list-block media-list goods">
@@ -64,7 +64,8 @@
                                 <div class="item-inner">
                                   <div class="item-text text">{{item.goods.title}}</div>
                                   <div class="item-title-row">
-                                    <div class="price">${{item.goods.price}}</div><i id="" v-on:click="onCartClick($event,item.goods)" class="iconfont icon-gouwuche price"></i>
+                                    <div class="price">${{item.goods.price}}</div>
+                                    <div id="" v-on:click="onCartClick($event,item.goods)" class="add-cart"><i class="iconfont icon-gouwuche price"></i></div>
                                   </div>
                                 </div></a></li>
                           </ul>
@@ -74,7 +75,8 @@
                   </li>
                 </ul>
               </div>
-              <div v-else class="empty"><img src="img/icon_empty.png">
+              <div v-else class="empty">
+                <div class="img"><img src="img/icon_empty.png"></div>
                 <div class="des">空空如也~</div>
               </div>
             </div>
@@ -111,7 +113,8 @@
                       <div class="item-inner">
                         <div class="item-text text">{{goods.title}}</div>
                         <div class="item-title-row">
-                          <div class="price">${{goods.price}}</div><i id="" v-on:click="onCartClick($event,goods)" class="iconfont icon-gouwuche price"></i>
+                          <div class="price">${{goods.price}}</div>
+                          <div id="" v-on:click="onCartClick($event,goods)" class="add-cart"><i class="iconfont icon-gouwuche price"></i></div>
                         </div>
                       </div></a></li>
                 </ul>
@@ -160,7 +163,8 @@
                   </li>
                 </ul>
               </div>
-              <div v-else class="empty"><img src="img/icon_empty.png">
+              <div v-else class="empty">
+                <div class="img"><img src="img/icon_empty.png"></div>
                 <div class="des">空空如也~</div>
               </div>
             </div>
@@ -223,8 +227,7 @@
         </div>
       </div>
       <div class="toolbar tabbar tabbar-labels">
-        <div class="toolbar-inner"><a href="#view-1" class="tab-link active"><i class="icon iconfont icon-home"></i><span class="tabbar-label">主頁</span></a><a href="#view-2" class="tab-link"><i class="iconfont icon-fenlei"></i><span class="tabbar-label">分類</span></a><a href="#view-3" class="tab-link"><i class="iconfont icon-gouwuche">
-              <!--span.badge 4--></i><span class="tabbar-label">購物車</span></a><a href="#view-4" class="tab-link"><i class="iconfont icon-geren"></i><span class="tabbar-label">我的</span></a></div>
+        <div class="toolbar-inner"><a href="#view-1" class="tab-link active"><i class="icon iconfont icon-home"></i><span class="tabbar-label">主頁</span></a><a href="#view-2" class="tab-link"><i class="iconfont icon-fenlei"></i><span class="tabbar-label">分類</span></a><a href="#view-3" class="tab-link"><i class="iconfont icon-gouwuche"><span v-if="badge3&gt;0" class="badge">{{badge3}}</span></i><span class="tabbar-label">購物車</span></a><a href="#view-4" class="tab-link"><i class="iconfont icon-geren"></i><span class="tabbar-label">我的</span></a></div>
       </div>
     </div>
     <div class="popover popover-qrcode">

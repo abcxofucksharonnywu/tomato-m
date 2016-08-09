@@ -22,5 +22,5 @@
 
 @interface CDVFirebase : CDVPlugin
 {}
-
+- (void)log:(CDVInvokedUrlCommand*)command;
 @end

@@ -51,7 +51,7 @@
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="Firebase">
-                <param name="ios-package" value="CDFirebase"/>
+                <param name="ios-package" value="CDVFirebase"/>
             </feature>
         </config-file>
         

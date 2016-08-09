@@ -23,10 +23,20 @@
 
 #import <Cordova/CDV.h>
 #import "CDVFirebase.h"
-
+#import <FirebaseAnalytics/FirebaseAnalytics.h>
 @interface CDVFirebase () {}
 @end
 
 @implementation CDVFirebase
 
+- (void)log:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"log-%@",command);
+    NSString *logName = command.arguments[0];
+    NSDictionary *params = command.arguments[1];
+    [FIRAnalytics logEventWithName:logName parameters:params];
+    
+}
+
 @end
+

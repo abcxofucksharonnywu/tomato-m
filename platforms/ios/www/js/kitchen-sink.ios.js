@@ -45,8 +45,8 @@ var view4 = myApp.addView('#view-4', {
 });
 
 
-var host = 'http://www.dajitogo.com:3000'
-// var host = 'http://localhost:3000'
+ var host = 'http://www.dajitogo.com:3000'
+//var host = 'http://localhost:3000'
 
 Date.prototype.format = function (format) {
     var o = {
@@ -74,6 +74,15 @@ Vue.filter('date', function (value) {
 Vue.filter('time', function (value) {
     return new Date(parseInt(value)).format('MM月dd日 hh:mm')
 })
+
+
+var gVue = new Vue({
+    el: '.toolbar.tabbar.tabbar-labels',
+    data: {
+        badge3: 0
+    },
+    methods: {}
+});
 
 
 var isApp = typeof cordova !== 'undefined'
@@ -201,9 +210,21 @@ function notification(doc, show) {
 
 }
 
+
 if (isApp) {
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
+        document.addEventListener("backbutton", function (event) {
+            myApp.hideIndicator()
+            var modal = myApp.closeModal()
+            if (!modal) {
+                if (myApp.getCurrentView().history.length > 1) {
+                    myApp.getCurrentView().router.back()
+                } else {
+                    navigator.app.exitApp()
+                }
+            }
+        }, false);
         userInit()
     }
 } else {
@@ -226,6 +247,8 @@ $(".tab-link").click(function (event) {
         if (!view3Init) {
             view3Init = true
             onCartPageInit.trigger()
+        } else {
+            onCartPageReInit.trigger()
         }
     } else if (href == '#view-4') {
         if (!view4Init) {
@@ -248,11 +271,17 @@ function generatePageId(pageName) {
 }
 
 $.ajaxSetup({
+    beforeSend: function (jqXHR, settings) {
+        jqXHR.url = settings.url;
+    },
     error: function (xhr, status, error) {
         console.log(xhr.statusText)
         myApp.hideIndicator()
         myApp.pullToRefreshDone($$('.pull-to-refresh-content'));
         toast(xhr.statusText == 'error' ? '網絡請求失敗' : xhr.statusText)
+        if (xhr.url.indexOf('/m/category/queryList') != -1) {
+            view2Init = false
+        }
     }
 });
 
@@ -518,7 +547,17 @@ function toCart(el) {
 
 var onCartPageInit = myApp.onPageInit('cart', function (page) {
     console.log('cart init')
+    gVue.badge3 = 0
     toCart(generatePageId('cart'))
+})
+
+var onCartPageReInit = myApp.onPageReinit('cart', function (page) {
+    console.log('cart reinit')
+    if (gVue.badge3 > 0) {
+        gVue.badge3 = 0
+        var ptrContent = $$(".page[data-page='cart'] .pull-to-refresh-content");
+        myApp.pullToRefreshTrigger(ptrContent)
+    }
 })
 
 
@@ -576,6 +615,7 @@ var onCategoryPageInit = myApp.onPageInit('category', function (page) {
             $(".navbar .search.text").text(result.extra.search)
             console.log("category load");
         } else {
+            view2Init = false
             toast(result.msg);
         }
     });
@@ -886,25 +926,31 @@ myApp.onPageInit('buy', function (page) {
             onCreateClick: function (event) {
                 event.preventDefault()
                 if (this.order.address) {
-                    myApp.showIndicator()
-                    $.post(host + "/m/order/create", {
-                        uid: user._id,
-                        order: JSON.stringify(this.order)
-                    }, function (result) {
-                        if (result.code == 200) {
-                            myApp.getCurrentView().router.back({
-                                animatePages: false
-                            })
-                            myApp.getCurrentView().router.load({
-                                url: 'order.html'
-                            })
-                            console.log("buy create load");
-                        } else {
-                            toast(result.msg);
-                            ;
-                        }
-                        myApp.hideIndicator()
-                    });
+                    if (this.order.items.length > 0) {
+                        myApp.showIndicator()
+                        var vue = this
+                        $.post(host + "/m/order/create", {
+                            uid: user._id,
+                            order: JSON.stringify(this.order)
+                        }, function (result) {
+                            if (result.code == 200) {
+                                gVue.badge3 = vue.order.items.length
+                                myApp.getCurrentView().router.back({
+                                    animatePages: false
+                                })
+                                myApp.getCurrentView().router.load({
+                                    url: 'order.html'
+                                })
+                                console.log("buy create load");
+                            } else {
+                                toast(result.msg);
+
+                            }
+                            myApp.hideIndicator()
+                        });
+                    } else {
+                        toast('請選擇商品')
+                    }
                 } else {
                     toast('請選擇收貨地址')
                 }
@@ -979,6 +1025,14 @@ myApp.onPageInit('order', function (page) {
     });
     myApp.pullToRefreshTrigger(ptrContent)
 
+    $(".view[data-page='order']  .right.home").click(function (event) {
+        event.preventDefault()
+        myApp.getCurrentView().router.back({
+            url: 'index.html',
+            force: true
+        })
+    })
+
 })
 
 
@@ -996,12 +1050,13 @@ myApp.onPageInit('order-detail', function (page) {
                 var vue = this
                 $.get(host + "/m/order/cancel", {uid: user._id, orderId: this.order._id}, function (result) {
                     if (result.code == 200) {
-                        page.query.callback(vue.order)
+                        if (page.query.callback) {
+                            page.query.callback(vue.order)
+                        }
                         myApp.getCurrentView().router.back()
                         console.log("order cancel");
                     } else {
                         toast(result.msg);
-                        ;
                     }
                     myApp.hideIndicator()
                 });
@@ -1127,29 +1182,31 @@ myApp.onPageInit('address-edit', function (page) {
     });
     $(".view[data-page='address-edit']  .right.edit").click(function (event) {
         event.preventDefault()
-        // var nameReg = /^.{1,30}$/;
-        // if (!nameReg.test(vue.address.name)) {
-        //     toast('請輸入30字內名字');
-        //     return
-        // }
-        //
+        var nameReg = /^.{1,50}$/;
+        if (vue.address.name==null||!nameReg.test(vue.address.name)) {
+            toast('請輸入30字內名字');
+            return
+        }
+
         // var phoneReg = /^(\+97[\s]{0,1}[\-]{0,1}[\s]{0,1}1|0)50[\s]{0,1}[\-]{0,1}[\s]{0,1}[1-9]{1}[0-9]{6}$/;
-        // if (!phoneReg.test(vue.address.phone)) {
-        //     toast('請輸入有效手機號');
-        //     return
-        // }
-        //
+        var phoneReg = /^.{1,50}$/;
+        if (vue.address.phone==null||!phoneReg.test(vue.address.phone)) {
+            toast('請輸入有效手機號');
+            return
+        }
+
         // var postReg = /^[0-9]{5}(?:-[0-9]{4})?$/;
-        // if (!postReg.test(vue.address.post)) {
-        //     toast('請輸入有效郵政編碼');
-        //     return
-        // }
-        //
-        // var contentReg = /^.{1,200}$/;
-        // if (!contentReg.test(vue.address.content)) {
-        //     toast('請輸入大於5個字的有效詳細地址');
-        //     return
-        // }
+        var postReg = /^.{1,50}$/;
+        if (vue.address.post==null||!postReg.test(vue.address.post)) {
+            toast('請輸入有效郵政編碼');
+            return
+        }
+
+        var contentReg = /^.{5,300}$/;
+        if (vue.address.content==null||!contentReg.test(vue.address.content)) {
+            toast('請輸入大於5個字的有效詳細地址');
+            return
+        }
 
         myApp.showIndicator();
         $.post(host + (vue.address._id ? '/m/address/edit' : '/m/address/add'), vue.address, function (result) {
@@ -1167,7 +1224,7 @@ myApp.onPageInit('address-edit', function (page) {
 })
 
 
-function toAddCart(goods) {
+function toAddCart(goods, callback) {
     myApp.showIndicator()
     var cart = {
         uid: user._id,
@@ -1179,11 +1236,15 @@ function toAddCart(goods) {
     }
     $.post(host + "/m/cart/add", cart, function (result) {
         if (result.code == 200) {
+            gVue.badge3++;
             console.log("add cart load");
             toast('添加購物車成功')
         } else {
             toast(result.msg);
-            ;
+
+        }
+        if (callback) {
+            callback(result.code == 200)
         }
         myApp.hideIndicator()
     });
@@ -1241,7 +1302,11 @@ myApp.onPageInit('detail', function (page) {
             },
             onCartClick: function (event) {
                 event.preventDefault()
-                toAddCart(this.goods)
+                toAddCart(this.goods, function (success) {
+                    if (success) {
+                        myApp.getCurrentView().router.back()
+                    }
+                })
             }
 
         }
