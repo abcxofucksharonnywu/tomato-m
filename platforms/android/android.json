@@ -49,7 +49,7 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"scan\"><param name=\"android-package\" value=\"org.apache.cordova.scan.scan\" /></feature>",
+                            "xml": "<feature name=\"scan\"><param name=\"android-package\" value=\"org.apache.cordova.scan.Scan\" /></feature>",
                             "count": 1
                         },
                         {
