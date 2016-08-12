@@ -45,8 +45,8 @@ var view4 = myApp.addView('#view-4', {
 });
 
 
-var host = 'http://www.dajitogo.com:3000'
-// var host = 'http://localhost:3000'
+// var host = 'http://www.dajitogo.com:3000'
+var host = 'http://localhost:3000'
 
 Date.prototype.format = function (format) {
     var o = {
@@ -468,11 +468,19 @@ function toCart(el) {
                     quantity: '1'
                 }, true)
             },
+            onQuantityContent: function (event, cart) {
+                event.preventDefault()
+                event.stopPropagation()
+            },
             onQuantityInput: function (event, cart) {
                 this.onQuantity(event, cart)
 
             },
             onQuantityDecrease: function (event, cart) {
+                if (cart.quantity <= 1) {
+                    toast('商品數量至少1件')
+                    return
+                }
                 cart.quantity--
                 this.onQuantity(event, cart)
             },
@@ -481,8 +489,6 @@ function toCart(el) {
                 this.onQuantity(event, cart)
             },
             onQuantity: function (event, cart) {
-                event.preventDefault()
-                event.stopPropagation()
                 var vue = this
                 myApp.showIndicator()
                 $.post(host + "/m/cart/edit", cart, function (result) {
@@ -658,7 +664,6 @@ myApp.onPageInit('search', function (page) {
                         console.log("search clear load");
                     } else {
                         toast(result.msg);
-                        ;
                     }
                     myApp.hideIndicator()
                 });
@@ -1046,7 +1051,7 @@ myApp.onPageInit('order', function (page) {
         })
         setTimeout(function () {
             $(".tab-link.home")[0].click()
-        },600)
+        }, 600)
 
     })
 
@@ -1063,20 +1068,23 @@ myApp.onPageInit('order-detail', function (page) {
         methods: {
             onCancelClick: function (event) {
                 event.preventDefault()
-                myApp.showIndicator()
                 var vue = this
-                $.get(host + "/m/order/cancel", {uid: user._id, orderId: this.order._id}, function (result) {
-                    if (result.code == 200) {
-                        if (page.query.callback) {
-                            page.query.callback(vue.order)
+                myApp.confirm('一旦取消無法恢復', '取消訂單', function () {
+                    myApp.showIndicator()
+                    $.get(host + "/m/order/cancel", {uid: user._id, orderId: vue.order._id}, function (result) {
+                        if (result.code == 200) {
+                            if (page.query.callback) {
+                                page.query.callback(vue.order)
+                            }
+                            myApp.getCurrentView().router.back()
+                            console.log("order cancel");
+                        } else {
+                            toast(result.msg);
                         }
-                        myApp.getCurrentView().router.back()
-                        console.log("order cancel");
-                    } else {
-                        toast(result.msg);
-                    }
-                    myApp.hideIndicator()
+                        myApp.hideIndicator()
+                    });
                 });
+
             },
             onGoodsClick: function (event, item) {
                 event.preventDefault()
