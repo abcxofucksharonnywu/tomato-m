@@ -293,26 +293,13 @@ function toActivity(el, name) {
         },
         watch: {
             'activity': function (val, oldVal) {
-                setTimeout(function () {
-                    var width = $(el + " .page-content").width()
-                    var ratio = width / 375.0
-                    $(el + " .page-content .banner").height(140 * ratio)
-                    $(el + " .page-content .multiRect >div").height(165 * ratio)
-                    $(el + " .page-content .rect >div").height(140 * ratio)
-                    $(el + " .page-content .double img").height((width - 1) / 2)
-                    myApp.initPageSwiper($$(el))
-                    var swipers = $$(el + " .page-content .banner")
-                    for (var i = 0; i < swipers.length; i++) {
-                        loop(swipers[i])
-                    }
-                    function loop(swiper) {
-                        setTimeout(function () {
-                            swiper.swiper.slideNext();
-                            loop(swiper)
-                        }, 5000)
-                    }
-                }, 100)
-
+                var width = $(el + " .page-content").width()
+                var ratio = width / 375.0
+                $(el + " .page-content .banner").height(140 * ratio)
+                $(el + " .page-content .multiRect >div").height(165 * ratio)
+                $(el + " .page-content .rect >div").height(140 * ratio)
+                $(el + " .page-content .double img").height((width - 1) / 2)
+                myApp.initPageSwiper($$(el))
             },
         },
         methods: {
@@ -477,10 +464,6 @@ function toCart(el) {
 
             },
             onQuantityDecrease: function (event, cart) {
-                if (cart.quantity <= 1) {
-                    toast('商品數量至少1件')
-                    return
-                }
                 cart.quantity--
                 this.onQuantity(event, cart)
             },
@@ -490,6 +473,11 @@ function toCart(el) {
             },
             onQuantity: function (event, cart) {
                 var vue = this
+                if (cart.quantity < 1) {
+                    toast('商品數量至少1件')
+                    cart.quantity = 1
+                    return
+                }
                 myApp.showIndicator()
                 $.post(host + "/m/cart/edit", cart, function (result) {
                     if (result.code == 200) {
