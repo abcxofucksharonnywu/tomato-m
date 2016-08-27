@@ -293,27 +293,14 @@ function toActivity(el, name) {
         },
         watch: {
             'activity': function (val, oldVal) {
-                setTimeout(function () {
-                    var width = $(el + " .page-content").width()
-                    var ratio = width / 375.0
-                    $(el + " .page-content .banner").height(140 * ratio)
-                    $(el + " .page-content .multiRect >div").height(165 * ratio)
-                    $(el + " .page-content .rect >div").height(140 * ratio)
-                    $(el + " .page-content .double img").height((width - 1) / 2)
-                    myApp.initPageSwiper($$(el))
-                    var swipers = $$(el + " .page-content .banner")
-                    for (var i = 0; i < swipers.length; i++) {
-                        loop(swipers[i])
-                    }
-                    function loop(swiper) {
-                        setTimeout(function () {
-                            console.log("aaaaaaaaaaa")
-                            swiper.swiper.slideNext();
-                            loop(swiper)
-                        }, 5000)
-                    }
-                }, 100)
-
+//                var width = $(el + " .page-content").width()
+                var width = 412
+                var ratio = width / 375.0
+                $(el + " .page-content .banner").height(140 * ratio)
+                $(el + " .page-content .multiRect >div").height(165 * ratio)
+                $(el + " .page-content .rect >div").height(140 * ratio)
+                $(el + " .page-content .double img").height((width - 1) / 2)
+                myApp.initPageSwiper($$(el))
             },
         },
         methods: {
@@ -430,7 +417,7 @@ myApp.onPageInit('activity', function (page) {
 myApp.onPageInit('activity-preview', function (page) {
     console.log('activity-preview init')
     toActivity(generatePageId('activity-preview'), 'activity-preview')
-}).trigger()
+})
 
 function toCart(el) {
     var vue = new Vue({
@@ -1053,7 +1040,7 @@ myApp.onPageInit('order', function (page) {
         })
         setTimeout(function () {
             $(".tab-link.home")[0].click()
-        }, 2000)
+        }, 600)
 
     })
 
@@ -1306,12 +1293,12 @@ myApp.onPageInit('detail', function (page) {
         },
         methods: {
             onImageClick: function (event, index) {
-                var myPhotoBrowserPopup = myApp.photoBrowser({
-                    photos: this.goods.images,
-                    initialSlide: index,
-                    type: 'popup'
-                });
-                myPhotoBrowserPopup.open();
+                // var myPhotoBrowserPopup = myApp.photoBrowser({
+                //     photos: this.goods.images,
+                //     initialSlide: index,
+                //     type: 'popup'
+                // });
+                // myPhotoBrowserPopup.open();
             },
             onCategoryClick: function (event) {
                 event.preventDefault()
