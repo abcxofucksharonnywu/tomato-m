@@ -64,6 +64,7 @@ function Device() {
             me.manufacturer = info.manufacturer || 'unknown';
             me.serial = info.serial || 'unknown';
             me.name = info.name || 'unknown';
+            me.width = info.width || 0;
             channel.onCordovaInfoReady.fire();
         },function(e) {
             me.available = false;

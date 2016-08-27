@@ -18,18 +18,21 @@
 */
 package org.apache.cordova.device;
 
-import java.util.TimeZone;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.res.Configuration;
+import android.provider.Settings;
+import android.util.DisplayMetrics;
 
-import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.bluetooth.BluetoothAdapter;
-import android.provider.Settings;
+import java.util.TimeZone;
 
 public class Device extends CordovaPlugin {
     public static final String TAG = "Device";
@@ -78,6 +81,7 @@ public class Device extends CordovaPlugin {
             r.put("isVirtual", this.isVirtual());
             r.put("serial", this.getSerialNumber());
             r.put("name", this.getName());
+            r.put("width", this.getWidth());
             callbackContext.success(r);
         } else {
             return false;
@@ -138,6 +142,18 @@ public class Device extends CordovaPlugin {
         BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
         String deviceName = myDevice != null ? myDevice.getName() : null;
         return deviceName;
+    }
+
+    public int getWidth() {
+        Context context = cordova.getActivity();
+        if (context == null) {
+            return 0;
+        }
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        Configuration configuration = context.getResources().getConfiguration();
+        int pxValue = configuration.orientation == Configuration.ORIENTATION_PORTRAIT ? dm.widthPixels : dm.heightPixels;
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
     }
 
     /**

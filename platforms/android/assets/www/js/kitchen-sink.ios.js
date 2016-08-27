@@ -155,8 +155,8 @@ function userInit() {
                 }
             })
         }
-
     })
+    onHomePageInit.trigger()
 }
 
 
@@ -294,7 +294,7 @@ function toActivity(el, name) {
         watch: {
             'activity': function (val, oldVal) {
 //                var width = $(el + " .page-content").width()
-                var width = 412
+                var width = device.width
                 var ratio = width / 375.0
                 $(el + " .page-content .banner").height(140 * ratio)
                 $(el + " .page-content .multiRect >div").height(165 * ratio)
@@ -381,14 +381,14 @@ function toScan() {
     })
 }
 
-myApp.onPageInit('home', function (page) {
+var onHomePageInit = myApp.onPageInit('home', function (page) {
     console.log('home init')
     toActivity(generatePageId('home'), 'home')
     $(".view[data-page='home']  .right.scan").click(function (event) {
         event.preventDefault()
         toScan()
     })
-}).trigger()
+})
 
 myApp.onPageInit('web', function (page) {
     console.log('web init')
