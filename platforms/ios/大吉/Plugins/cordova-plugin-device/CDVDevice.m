@@ -90,7 +90,8 @@
              @"uuid": [self uniqueAppInstanceIdentifier:device],
              @"cordova": [[self class] cordovaVersion],
              @"isVirtual": @([self isVirtual]),
-             @"name":[device name]
+             @"name":[device name],
+             @"width":[self width]
              };
 }
 
@@ -108,6 +109,11 @@
     #else
         return false;
     #endif
+}
+
+
+-(NSNumber*)width{
+    return @([ UIScreen mainScreen ].bounds.size.width);
 }
 
 @end
