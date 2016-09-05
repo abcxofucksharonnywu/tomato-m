@@ -46,7 +46,7 @@ var view4 = myApp.addView('#view-4', {
 
 
 var host = 'http://www.dajitogo.com:3000'
-//var host = 'http://localhost:3000'
+// var host = 'http://localhost:3000'
 
 
 var view2Init = false
@@ -245,7 +245,6 @@ if (isApp) {
 }
 
 
-
 $(".tab-link").click(function (event) {
     event.preventDefault()
     var href = $(event.currentTarget).attr('href')
@@ -304,7 +303,7 @@ function toActivity(el, name) {
         },
         watch: {
             'activity': function (val, oldVal) {
-                var width = isApp?device.width:$(el + " .page-content").width()
+                var width = isApp ? device.width : $(el + " .page-content").width()
                 var ratio = width / 375.0
                 $(el + " .page-content .banner").height(140 * ratio)
                 $(el + " .page-content .multiRect >div").height(165 * ratio)
@@ -390,7 +389,6 @@ function toScan() {
 
     })
 }
-
 
 
 myApp.onPageInit('web', function (page) {
@@ -514,7 +512,7 @@ function toCart(el) {
                 });
             },
             onCheckAll: function (event) {
-                event.preventDefault()
+                if (event) event.preventDefault()
                 this.checks.splice(0, this.checks.length);
                 if (this.checkAll == false) {
                     var vue = this
@@ -540,12 +538,14 @@ function toCart(el) {
     ptrContent.on('refresh', function (event) {
         $.get(host + "/m/cart/queryList", {uid: user._id}, function (result) {
             if (result.code == 200) {
-                vue.checks.splice(0, vue.checks.length);
+                // vue.checks.splice(0, vue.checks.length);
                 vue.carts = result.content
+                vue.checkAll = false
+                vue.onCheckAll(null)
                 console.log("cart load");
             } else {
                 toast(result.msg);
-                ;
+
             }
             myApp.pullToRefreshDone(ptrContent);
         });
@@ -1026,7 +1026,7 @@ myApp.onPageInit('order', function (page) {
                 console.log("order load");
             } else {
                 toast(result.msg);
-                ;
+
             }
             myApp.pullToRefreshDone(ptrContent);
 
@@ -1055,7 +1055,8 @@ myApp.onPageInit('order-detail', function (page) {
     var vue = new Vue({
         el: generatePageId('order-detail'),
         data: {
-            order: page.query.order
+            order: page.query.order,
+            extra: {pay: {text: '貨到付款', hint: '（支持現金或者POS機）'}, delivery: {text: '配送時間', hint: '（接受訂單後40分鐘內到達）'}}
         },
         methods: {
             onCancelClick: function (event) {
@@ -1096,10 +1097,11 @@ myApp.onPageInit('order-detail', function (page) {
         $.get(host + "/m/order/query", {orderId: page.query.order._id}, function (result) {
             if (result.code == 200) {
                 vue.order = result.content
+                vue.extra = result.extra
                 console.log("order-detail load");
             } else {
                 toast(result.msg);
-                ;
+
             }
             myApp.hideIndicator()
         });
@@ -1168,7 +1170,7 @@ myApp.onPageInit('address', function (page) {
                 console.log("addresses load");
             } else {
                 toast(result.msg);
-                ;
+
             }
             myApp.pullToRefreshDone(ptrContent);
 
@@ -1342,7 +1344,7 @@ myApp.onPageInit('detail', function (page) {
                 console.log("detail load");
             } else {
                 toast(result.msg);
-                ;
+
             }
             myApp.hideIndicator()
         });
