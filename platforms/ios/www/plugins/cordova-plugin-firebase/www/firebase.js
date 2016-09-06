@@ -3,7 +3,11 @@ var exec = require('cordova/exec');
 var firebase = {
 	log:function(name,params) {
 		exec(null, null, "Firebase", "log", [name,params]);
-	}
+	},
+    store:function() {
+        exec(null, null, "Firebase", "store", []);
+    }
+
 };
 module.exports = firebase;
 });

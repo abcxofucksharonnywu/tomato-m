@@ -38,5 +38,10 @@
     
 }
 
+-(void)store:(CDVInvokedUrlCommand *)command{
+    NSString * url = [NSString stringWithFormat:@"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@",@"1151418807"];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+}
+
 @end
 
