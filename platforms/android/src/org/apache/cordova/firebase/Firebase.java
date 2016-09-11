@@ -18,6 +18,8 @@
 */
 package org.apache.cordova.firebase;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -47,7 +49,14 @@ public class Firebase extends CordovaPlugin {
             Log.v("log-" + logName, params.toString());
             FirebaseAnalytics.getInstance(cordova.getActivity()).logEvent(logName, params);
             callbackContext.success();
-        } else {
+        } else if("store".equals(action)){
+            final String appPackageName = cordova.getActivity().getPackageName(); // getPackageName() from Context or Activity object
+            try {
+                cordova.getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            } catch (android.content.ActivityNotFoundException ange) {
+                cordova.getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+        }else{
             return false;
         }
         return true;
